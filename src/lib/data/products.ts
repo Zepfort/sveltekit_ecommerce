@@ -7,6 +7,9 @@ export interface Product {
   description: string;
   rating: number;
   sold: number;
+  condition: string;
+  min_order: string;
+  from: string;
 }
 
 
@@ -19,6 +22,9 @@ export const products: Product[] = [
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam aliquam lectus consequat posuere luctus. Etiam pretium, ligula ut accumsan facilisis, est felis tristique leo, at feugiat nunc justo in velit. Proin quis tempus magna. Suspendisse scelerisque tortor in nunc pharetra aliquam. Fusce cursus vulputate arcu id pulvinar. Sed vitae est fringilla, euismod leo eget, vestibulum risus. Pellentesque lorem eros, sagittis sit amet venenatis gravida, congue vel libero. ",
     rating: 4.6,
     sold: 600,
+    condition: "Baru",
+    min_order: "1 Buah",
+    from: "Daerah Istimewa Yogyakarta"
   },
   {
     id: "2",
@@ -28,6 +34,9 @@ export const products: Product[] = [
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam aliquam lectus consequat posuere luctus. Etiam pretium, ligula ut accumsan facilisis, est felis tristique leo, at feugiat nunc justo in velit. Proin quis tempus magna. Suspendisse scelerisque tortor in nunc pharetra aliquam. Fusce cursus vulputate arcu id pulvinar. Sed vitae est fringilla, euismod leo eget, vestibulum risus. Pellentesque lorem eros, sagittis sit amet venenatis gravida, congue vel libero. ",
     rating: 4.3,
     sold: 34,
+    condition: "Baru",
+    min_order: "1 Buah",
+    from: "Daerah Istimewa Yogyakarta"
   },
   {
     id: "3",
@@ -37,6 +46,9 @@ export const products: Product[] = [
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam aliquam lectus consequat posuere luctus. Etiam pretium, ligula ut accumsan facilisis, est felis tristique leo, at feugiat nunc justo in velit. Proin quis tempus magna. Suspendisse scelerisque tortor in nunc pharetra aliquam. Fusce cursus vulputate arcu id pulvinar. Sed vitae est fringilla, euismod leo eget, vestibulum risus. Pellentesque lorem eros, sagittis sit amet venenatis gravida, congue vel libero. ",
     rating: 4.3,
     sold: 34,
+    condition: "Baru",
+    min_order: "1 Buah",
+    from: "Daerah Istimewa Yogyakarta"
   },
   {
     id: "4",
@@ -46,6 +58,9 @@ export const products: Product[] = [
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam aliquam lectus consequat posuere luctus. Etiam pretium, ligula ut accumsan facilisis, est felis tristique leo, at feugiat nunc justo in velit. Proin quis tempus magna. Suspendisse scelerisque tortor in nunc pharetra aliquam. Fusce cursus vulputate arcu id pulvinar. Sed vitae est fringilla, euismod leo eget, vestibulum risus. Pellentesque lorem eros, sagittis sit amet venenatis gravida, congue vel libero. ",
     rating: 4.3,
     sold: 34,
+    condition: "Baru",
+    min_order: "1 Buah",
+    from: "Daerah Istimewa Yogyakarta"
   },
   {
     id: "5",
@@ -55,6 +70,9 @@ export const products: Product[] = [
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam aliquam lectus consequat posuere luctus. Etiam pretium, ligula ut accumsan facilisis, est felis tristique leo, at feugiat nunc justo in velit. Proin quis tempus magna. Suspendisse scelerisque tortor in nunc pharetra aliquam. Fusce cursus vulputate arcu id pulvinar. Sed vitae est fringilla, euismod leo eget, vestibulum risus. Pellentesque lorem eros, sagittis sit amet venenatis gravida, congue vel libero. ",
     rating: 4.3,
     sold: 34,
+    condition: "Baru",
+    min_order: "1 Buah",
+    from: "Daerah Istimewa Yogyakarta"
   },
   {
     id: "6",
@@ -64,6 +82,9 @@ export const products: Product[] = [
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam aliquam lectus consequat posuere luctus. Etiam pretium, ligula ut accumsan facilisis, est felis tristique leo, at feugiat nunc justo in velit. Proin quis tempus magna. Suspendisse scelerisque tortor in nunc pharetra aliquam. Fusce cursus vulputate arcu id pulvinar. Sed vitae est fringilla, euismod leo eget, vestibulum risus. Pellentesque lorem eros, sagittis sit amet venenatis gravida, congue vel libero. ",
     rating: 4.3,
     sold: 34,
+    condition: "Baru",
+    min_order: "1 Buah",
+    from: "Daerah Istimewa Yogyakarta"
   },
   {
     id: "7",
@@ -73,6 +94,9 @@ export const products: Product[] = [
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam aliquam lectus consequat posuere luctus. Etiam pretium, ligula ut accumsan facilisis, est felis tristique leo, at feugiat nunc justo in velit. Proin quis tempus magna. Suspendisse scelerisque tortor in nunc pharetra aliquam. Fusce cursus vulputate arcu id pulvinar. Sed vitae est fringilla, euismod leo eget, vestibulum risus. Pellentesque lorem eros, sagittis sit amet venenatis gravida, congue vel libero. ",
     rating: 4.3,
     sold: 34,
+    condition: "Baru",
+    min_order: "1 Buah",
+    from: "Daerah Istimewa Yogyakarta"
   },
   // dst. sampai sekitar 20 produk
 ];

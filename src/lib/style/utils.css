@@ -1,0 +1,22 @@
+:root {
+  --primary: #0443F2; 
+  --hover-primary : #0433C2;
+  --seconder: #FF5722;
+  --text: #FAFAFA;
+  --background: #FAFAFA;
+}
+
+.col-primary {
+  background-color: var(--primary);
+  color: var(--text);
+}
+
+.col-primary:hover {
+  background-color: var(--hover-primary);
+  color: var(--text);
+}
+
+.col-background {
+  background-color: var(--background);
+  color: var(--primary);
+}
