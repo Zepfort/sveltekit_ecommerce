@@ -98,16 +98,16 @@
 									{userProfile?.name}
 								</span>
 							</div>
-							<div class="user-dropdown">
+							<div class="user-dropdown ">
 								<a
 									href="/profile"
-									class="col-text block cursor-pointer bg-gray-950 px-4 py-2 text-sm"
+									class="col-bg-admin block cursor-pointer px-4 py-2 text-sm"
 								>
 									Profil
 								</a>
 								<button
 									onclick={logout}
-									class="col-text block w-full cursor-pointer bg-gray-950 px-4 py-2 text-left text-sm"
+									class="col-bg-admin block w-full cursor-pointer px-4 py-2 text-left text-sm"
 								>
 									Keluar
 								</button>
