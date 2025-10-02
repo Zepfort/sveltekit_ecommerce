@@ -7,13 +7,12 @@ export const load: PageServerLoad = async (event) => {
 
   // Ambil daftar produk
   const { data: products, error: prodErr } = await supabase
-    .from('products')
-    .select('id, name, price, stock, image_url, is_active, category_id')
+    .from('products_with_category')
+    .select(`*`)
     .order('created_at', { ascending: false });
 
   if (prodErr) {
     console.error('Error fetching products:', prodErr.message);
-    // fallback ke array kosong agar UI tidak crash
   }
 
   // Ambil daftar kategori

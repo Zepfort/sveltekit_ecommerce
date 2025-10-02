@@ -3,10 +3,24 @@
   import { supabase } from '$lib/supabaseClient';
   import '$lib/style/utils.css';
   import { enhance } from '$app/forms';
+  import type { ActionResult } from '@sveltejs/kit';
+	import { invalidate, invalidateAll } from '$app/navigation';
 
   let { data } = $props();
-  let { categories, products } = data;
+  let { categories} = data;
 
+  type ProductWithCategory = {
+  id: string;
+  name: string;
+  price: number;
+  stock: number;
+  image_url: string | null;
+  is_active: boolean;
+  category_id: string;
+  category_name: string | null;
+};
+
+let products: ProductWithCategory[] = data.products;
   let showModal = $state(false);
   let errorMsg = $state('');
   let newName = $state('');
@@ -29,6 +43,38 @@
     newImageFile = null;
     newIsActive = true;
   }
+
+
+
+  function handleEdit() {
+    alert("cooming soon")
+  }
+
+  function handleDelete() {
+    alert("cooming soon")
+  }
+
+  async function handleSubmit(event: SubmitEvent) {
+    event?.preventDefault();
+    const form = event.currentTarget as HTMLFormElement;
+    const fd = new FormData(form);
+
+
+    const resp = await fetch(form.action, {
+      method: form.method,
+      body: fd
+    })
+
+    if(resp.ok) {
+      showModal= false;
+      await invalidateAll();
+    } else {
+      const result = await resp.json().catch(() => null);
+      errorMsg = result?.message ?? "Gagal Menyimpan Produk";
+    }
+}
+
+   
 </script>
 
 <section class="space-y-6">
@@ -57,13 +103,14 @@
         >
           &times;
         </button>
-        <h2 class="mb-4 text-xl font-semibold text-slate-800">New Product</h2>
-
         <form
           method="POST"
           enctype="multipart/form-data"
-          use:enhance
+          action="/admin/products"
+          onsubmit={handleSubmit}
+          
         >
+        
           <div class="space-y-4">
             <div>
               <label for="product_name" class="mb-1 block text-slate-700">Product Name</label>
@@ -183,20 +230,23 @@
   {/if}
 
   <div class="overflow-x-auto rounded-lg bg-white shadow">
+    {#key data.products.length}
+
     <table class="min-w-full text-left text-sm">
       <thead class="bg-gray-100 text-gray-700">
         <tr>
-          <th class="px-4 py-2">IMAGE</th>
-          <th class="px-4 py-2">NAME</th>
-          <th class="px-4 py-2">CATEGORY</th>
-          <th class="px-4 py-2">PRICE</th>
-          <th class="px-4 py-2">STOCK</th>
-          <th class="px-4 py-2">STATUS</th>
+          <th class="px-4 py-2">Image</th>
+          <th class="px-4 py-2">Name</th>
+          <th class="px-4 py-2">Category</th>
+          <th class="px-4 py-2">Price</th>
+          <th class="px-4 py-2">Stock</th>
+          <th class="px-4 py-2">Status</th>
+          <th class="px-4 py-2">Actions</th>
         </tr>
       </thead>
       <tbody>
         {#if products.length}
-          {#each products as p}
+          {#each data.products as p}
             <tr class="border-b hover:bg-gray-50">
               <td class="px-4 py-2">
                 {#if p.image_url}
@@ -206,7 +256,7 @@
                 {/if}
               </td>
               <td class="px-4 py-2">{p.name}</td>
-              <td class="px-4 py-2">{p.category_id}</td>
+              <td class="px-4 py-2">{p.category_name ?? '-'}</td>
               <td class="px-4 py-2">Rp {p.price}</td>
               <td class="px-4 py-2">{p.stock}</td>
               <td class="px-4 py-2">
@@ -216,6 +266,22 @@
                   <span class="rounded bg-red-100 px-2 py-1 text-xs text-red-700">Inactive</span>
                 {/if}
               </td>
+              <td class="px-4 py-3 flex items-center">
+							<div class="flex justify-center gap-2">
+								<button
+									onclick={() => handleEdit()}
+									class="rounded bg-blue-500 p-2 text-white transition hover:bg-blue-600"
+								>
+									<Icon icon="mdi:pencil" width="18" height="18" />
+								</button>
+								<button
+									onclick={() => handleDelete()}
+									class="rounded bg-rose-500 p-2 text-white transition hover:bg-rose-600"
+								>
+									<Icon icon="mdi:trash-can" width="18" height="18" />
+								</button>
+							</div>
+						</td>
             </tr>
           {/each}
         {:else}
@@ -225,5 +291,6 @@
         {/if}
       </tbody>
     </table>
+    {/key}
   </div>
 </section>

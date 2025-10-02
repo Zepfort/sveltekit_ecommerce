@@ -77,7 +77,7 @@
 	<main class="min-h-screen flex-1">
 		<!-- topbar -->
 		<header
-			class="flex items-center justify-between border-b border-white/6 bg-[#050417] px-6 py-3 text-white"
+			class="flex items-center justify-between sticky border-b border-white/6 bg-[#050417] px-6 py-3 text-white"
 		>
 			<div class="flex items-center gap-4">
 				<div class="text-lg font-semibold">Admin Panel</div>
