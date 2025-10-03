@@ -17,6 +17,32 @@
 
 </script>
 
+{#if userProfile}
+  <div class="user-badge-group">
+    <div class="user-info">
+      <div class="h-9 w-9 flex items-center justify-center rounded-full bg-indigo-600 text-white">
+        <Icon icon="material-symbols:person-outline" width="24" height="24" />
+      </div>
+      <span class="text-sm text-white">
+        {userProfile?.name}
+      </span>
+    </div>
+    <div class="user-dropdown">
+      <a href="/profile" class="block px-4 py-2 text-sm hover:bg-gray-100">
+        Profil
+      </a>
+      <button onclick={logout} class="block w-full px-4 py-2 text-left text-sm hover:bg-gray-100">
+        Keluar
+      </button>
+    </div>
+  </div>
+{:else}
+  <div class="flex gap-2">
+    <Button href="/login" isLogin={true}>Log In</Button>
+    <Button href="/register">Sign Up</Button>
+  </div>
+{/if}
+
 <style>
   .user-badge-group {
     position: relative;
@@ -50,29 +76,3 @@
     color: white;
   }
 </style>
-
-{#if userProfile}
-  <div class="user-badge-group">
-    <div class="user-info">
-      <div class="h-9 w-9 flex items-center justify-center rounded-full bg-indigo-600 text-white">
-        <Icon icon="material-symbols:person-outline" width="24" height="24" />
-      </div>
-      <span class="text-sm text-white">
-        {userProfile?.name}
-      </span>
-    </div>
-    <div class="user-dropdown">
-      <a href="/profile" class="block px-4 py-2 text-sm hover:bg-gray-100">
-        Profil
-      </a>
-      <button onclick={logout} class="block w-full px-4 py-2 text-left text-sm hover:bg-gray-100">
-        Keluar
-      </button>
-    </div>
-  </div>
-{:else}
-  <div class="flex gap-2">
-    <Button href="/login" isLogin={true}>Log In</Button>
-    <Button href="/register">Sign Up</Button>
-  </div>
-{/if}

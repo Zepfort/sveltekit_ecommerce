@@ -4,9 +4,11 @@
     import Icon from "@iconify/svelte";
     import "/src/lib/style/button.css"
     import CartButton from "../../components/CartButton.svelte";
-    // import type { LayoutData } from '$types';
+    
     let { data } = $props();
+    // console.log('navbar data:', data);
     let {userProfile} = data
+    let categories = data.categories ?? []
 
 </script>
 
@@ -22,13 +24,12 @@
                 <div class="flex  gap-0 rounded-lg bg-white ">
                     <select name="" id="" class="border-none rounded-l-lg outline-none">
                         <option value="">Kategori</option>
-                        <option value="">Pria</option>
-                        <option value="">Wanita</option>
-                        <option value="">Elektronik</option>
-                        <option value="">Buku</option>
+                        {#each categories as c}
+                            <option value={c.id}>{c.name}</option>
+                        {/each}
                     </select>
                     <input type="text" class="min-w-[600px] border-none rounded-r-lg outline-none" placeholder="Cari di Renzmart"/>
-                    <button class="flex items-center justify-center border-none px-2 rounded-r-lg w-16 col-bg-primary cursor-pointer">
+                    <button class="flex items-center justify-center border-none px-2 rounded-r-lg w-12 col-bg-primary cursor-pointer">
                     <Icon icon="mdi:magnify" width={24} height={24} color="white"/>
                     </button>
                 </div>

@@ -2,7 +2,7 @@
     import Icon from "@iconify/svelte";
 </script>
 
-<div class="flex flex-col w-full h-[260px] bg-gray-950 mb-0">
+<div class="flex flex-col w-full h-[240px] bg-gray-950 mb-0">
     <div class="flex justify-between h-[200px] pb2">
         <!-- Logo -->
         <div class="flex justify-center w-1/3 items-center ">
@@ -31,8 +31,8 @@
             </ul>
           </div>
     </div>
-    <div class=" flex justify-center items-center bg-gray-700 h-[60px] font-light text-md">
-        <h3 class="text-center text-white">2025, All Rights Reserved</h3>
+    <div class="flex justify-center items-center bg-gray-700 h-[40px] font-light text-md">
+        <h3 class="align-text-bottom text-white">©Alif Januar Rizky, 2025</h3>
     </div>
 </div>
 

@@ -13,7 +13,7 @@
     }
 
     onMount(() => {
-        intervalId = setInterval(changeImage, 3000); // Ubah 3000 menjadi interval waktu yang diinginkan
+        intervalId = setInterval(changeImage, 3000); 
     });
 
     onDestroy(() => {

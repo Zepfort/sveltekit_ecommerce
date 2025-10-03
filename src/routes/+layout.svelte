@@ -8,9 +8,10 @@
   import { invalidate } from '$app/navigation'
 
   let { data, children } = $props()
+  // console.log('layout data:', data);
   let { session, user, } = $derived(data)
   
-  
+
   $effect(() => {
     const { data } = supabase.auth.onAuthStateChange((_, newSession) => {
       if (newSession?.expires_at !== session?.expires_at) {
@@ -26,7 +27,7 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-{#if page.url.pathname.startsWith('/login') || page.url.pathname.startsWith('/register') || page.url.pathname.startsWith('/admin')}
+{#if page.url.pathname.startsWith('/login') || page.url.pathname.startsWith('/register') || page.url.pathname.startsWith('/profile') || page.url.pathname.startsWith('/admin')}
 
 <div class="flex justify-center items-center h-screen">
 	{@render children?.()}
