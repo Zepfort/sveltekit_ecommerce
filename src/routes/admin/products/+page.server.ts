@@ -32,7 +32,7 @@ export const load: PageServerLoad = async (event) => {
 };
 
 export const actions: Actions = {
-  default: async (event) => {
+  createProduct: async (event) => {
     const supabase = createSupabaseServerClient(event);
     const fd = await event.request.formData();
 
@@ -95,7 +95,39 @@ export const actions: Actions = {
       return fail(400, { message: insertError.message });
     }
 
-    // Setelah sukses, kita bisa “redirect” ke halaman produk agar load() dipanggil ulang
+    throw redirect(303, '/admin/products');
+  },
+
+  deleteProduct: async (event) => {
+    const supabase = createSupabaseServerClient(event);
+    const fd = await event.request.formData();
+    const id = fd.get('id');
+    console.log('[DELETE] id dari form =', id); 
+
+    if (!id) return fail(400, { message: 'ID produk diperlukan' });
+
+    // opsional: bersihkan file storage
+    const { data: prod } = await supabase
+      .from('products')
+      .select('image_url')
+      .eq('id', id)
+      .single();
+
+    if (prod?.image_url) {
+      const path = prod.image_url.split('/').pop()!;
+      await supabase.storage.from('product-images').remove([path]);
+    }
+
+    const { error } = await supabase
+  .from('products')
+  .delete() // tambahkan count
+  .eq('id', id);
+
+    if (error) return fail(500, { message: error.message });
+
     throw redirect(303, '/admin/products');
   }
-};
+}
+
+
+

@@ -7,7 +7,7 @@
   let { userProfile }: { userProfile: { name: string } | null } = $props()
 
   async function logout() {
-    const { error } = await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut({scope: 'local'});
     if (error) {
       console.error("Logout gagal:", error);
     } else {
@@ -20,7 +20,7 @@
 {#if userProfile}
   <div class="user-badge-group">
     <div class="user-info">
-      <div class="h-9 w-9 flex items-center justify-center rounded-full bg-indigo-600 text-white">
+      <div class="h-9 w-9 flex items-center justify-center rounded-full bg-indigo-700 text-white">
         <Icon icon="material-symbols:person-outline" width="24" height="24" />
       </div>
       <span class="text-sm text-white">
@@ -28,10 +28,10 @@
       </span>
     </div>
     <div class="user-dropdown">
-      <a href="/profile" class="block px-4 py-2 text-sm hover:bg-gray-100">
+      <a href="/profile" class="block px-4 py-2 text-sm hover:bg-blue-700">
         Profil
       </a>
-      <button onclick={logout} class="block w-full px-4 py-2 text-left text-sm hover:bg-gray-100">
+      <button onclick={logout} class="block w-full px-4 py-2 text-left text-sm hover:bg-blue-700">
         Keluar
       </button>
     </div>
@@ -56,7 +56,8 @@
     top: 100%;
     margin-top: 0.25rem; 
     width: 10rem;
-    background: white;
+    background: #050417;
+    color: #ebe9e9;
     border-radius: 0.25rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     visibility: hidden;
