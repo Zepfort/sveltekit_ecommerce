@@ -13,6 +13,7 @@
 		id: string;
 		name: string;
 		price: number;
+		description: string | null;
 		stock: number;
 		image_url: string | null;
 		is_active: boolean;
@@ -20,6 +21,7 @@
 		category_name: string | null;
 	};
 
+	// states
 	let toDeleteId = $state<String | null>(null);
 	let formNode = $state<HTMLFormElement>();
 	let products: ProductWithCategory[] = data.products;
@@ -33,8 +35,10 @@
 	let newCategoryId = $state('');
 	let newImageFile: File | null = $state(null);
 	let newIsActive = $state(true);
-	let saving = $state(false);
+	let isEditing = $state(false)
+	let editId = $state('')
 
+	// Handle insert product
 	function handleAddProduct() {
 		showModal = true;
 		errorMsg = '';
@@ -45,31 +49,31 @@
 		newCategoryId = '';
 		newImageFile = null;
 		newIsActive = true;
+		isEditing = false;  // tambahkan ini
+  		editId = '';  
 	}
 
-	function handleEdit() {
-		alert('cooming soon');
+	// handle edit product
+	function openEditModal(p: ProductWithCategory) {
+		showModal = true;
+		isEditing = true;
+		editId = p.id;
+		newName = p.name;
+		newDescription = p.description ?? '';
+		newPrice = String(p.price);
+		newStock = String(p.stock);
+		newCategoryId = p.category_id;
+		newImageFile = null;
+		newIsActive = p.is_active;
+		errorMsg = '';
 	}
 
-	// async function handleDelete(id: string) {
-	// 	if (!confirm('Yakin ingin menghapus produk ini?')) return;
-
-	// 	const fd = new FormData();
-	// 	fd.set('id', id);
-
-	// 	const res = await fetch('?/deleteProduct', {
-	// 		method: 'POST',
-	// 		body: fd
-	// 	});
-
-	// 	const result = deserialize(await res.text()); // helper bawaan SvelteKit
-	// 	applyAction(result); // otomatis invalidate + navigasi
-	// }
-
-	/* helper SvelteKit (copas saja) */
+	/* helper SvelteKit */
 	function deserialize(text: string) {
 		return text ? JSON.parse(text) : { type: 'success', status: 204 };
 	}
+
+	// Handle submit product 
 	async function handleSubmit(event: SubmitEvent) {
 		event?.preventDefault();
 		const form = event.currentTarget as HTMLFormElement;
@@ -119,9 +123,12 @@
 				<form
 					method="POST"
 					enctype="multipart/form-data"
-					action="?/createProduct"
+					action={ isEditing ? '?/updateProduct' : '?/createProduct'}
 					onsubmit={handleSubmit}
 				>
+				{#if isEditing}
+					<input type="hidden" name="id" value={editId}/>
+				{/if}
 					<div class="space-y-4">
 						<div>
 							<label for="product_name" class="mb-1 block text-slate-700">Product Name</label>
@@ -132,6 +139,7 @@
 								bind:value={newName}
 								class="w-full rounded border px-3 py-2"
 								placeholder="Enter product name"
+								required
 							/>
 						</div>
 
@@ -156,6 +164,7 @@
 									bind:value={newPrice}
 									class="w-full rounded border px-3 py-2"
 									placeholder="0"
+									required
 								/>
 							</div>
 							<div>
@@ -167,6 +176,7 @@
 									bind:value={newStock}
 									class="w-full rounded border px-3 py-2"
 									placeholder="0"
+									required
 								/>
 							</div>
 						</div>
@@ -178,6 +188,7 @@
 								name="category_id"
 								bind:value={newCategoryId}
 								class="w-full rounded border px-3 py-2"
+								required
 							>
 								<option value="">-- Choose Category --</option>
 								{#each categories as c}
@@ -225,13 +236,12 @@
 							>
 								Cancel
 							</button>
-
 							<button
 								type="submit"
 								class="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-								disabled={saving}
+								
 							>
-								{#if saving}Saving...{:else}Save{/if}
+								{isEditing ? 'Update' : 'Save'}
 							</button>
 						</div>
 					</div>
@@ -308,7 +318,7 @@
 								<td class="flex items-center px-4 py-3">
 									<div class="flex justify-center gap-2">
 										<button
-											onclick={() => handleEdit()}
+											onclick={() => openEditModal(p)}
 											class="rounded bg-blue-500 p-2 text-white transition hover:bg-blue-600"
 										>
 											<Icon icon="mdi:pencil" width="18" height="18" />
