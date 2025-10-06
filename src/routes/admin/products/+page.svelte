@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
-	import { supabase } from '$lib/supabaseClient';
 	import '$lib/style/utils.css';
 	import { enhance } from '$app/forms';
 	import type { ActionResult } from '@sveltejs/kit';

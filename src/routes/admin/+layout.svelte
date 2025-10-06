@@ -55,15 +55,14 @@
 					<li>
 						<a
 							href={item.href}
-							class="flex flex-row items-center gap-3 rounded-md px-3 py-2 col-bg-admin 
-                            "
+							class="flex flex-row gap-3 rounded-md px-3 py-2 col-bg-admin"
 						>
 							<Icon
 								icon={iconPanel[item.iconKey].icon}
 								width={iconPanel[item.iconKey].width}
 								height={iconPanel[item.iconKey].height}
 							/>
-							<span class="text-sm font-medium">{item.title}</span>
+							<p class="text-sm font-medium">{item.title}</p>
 						</a>
 					</li>
 				{/each}
