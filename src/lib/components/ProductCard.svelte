@@ -6,7 +6,7 @@
 
 </script>
 
-<a href={`/product/${product.slug}`} class="product-card my-2">
+<a href={`/product/${product.slug}`} class="product-card my-2 w-[12rem] h-[18rem]">
     <div class="card-image-container">
         <img src={product.image_url} alt={product.name} class="card-image"/>
     </div>
@@ -25,8 +25,6 @@
 <style>
     .product-card {
         border: 1px solid #ccc;
-        width: 200px;
-        height: 300px;
         border-radius: 8px;
         overflow: hidden;
         transition: box-shadow 0.2 ease;

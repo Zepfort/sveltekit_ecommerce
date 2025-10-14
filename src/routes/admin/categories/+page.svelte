@@ -92,12 +92,16 @@
 
 	async function handleDelete(id: string) {
 		if (!confirm('Are you sure to delete this?')) return;
-		const { error } = await supabase.from('categories').delete().eq('id', id);
-		if (error) {
-			alert('Gagal menghapus: ' + error.message);
-		return;
+		const res = await fetch(`/admin/categories/${id}`, {
+			method: 'DELETE'
+		});
+		const result = await res.json();
+
+		if(!res.ok) {
+			alert('Gagal menghapus: ' + result.message);
+			return;
 		}
-		// refresh
+		alert('Kategori berhasil dhapus')
 		await loadCategories();
 	}
 
@@ -157,8 +161,6 @@
 	}
 
 	
-    	
-
 </script>
 
 <section class="space-y-6">

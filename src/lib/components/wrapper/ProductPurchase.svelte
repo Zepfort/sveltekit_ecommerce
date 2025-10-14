@@ -30,7 +30,7 @@
 </script>
 
 {#if product}
-<div class="flex flex-col gap-2 min-w-[16rem]">
+<div class="flex flex-col gap-2 sm:w-[8rem] md:w-[12rem] lg:w-[16rem]">
   <div class="flex flex-row items-center py-0.5 gap-6">
     <Quantity {product} quantity={quantity} on:change={handleQtyChange} />
     <p class="text-lg font-normal text-gray-700">

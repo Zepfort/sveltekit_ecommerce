@@ -7,7 +7,7 @@
 	export let products: ProductListItem[];
 </script>
 
-<div class="container mx-auto flex flex-col items-center px-32">
+<div class="container mx-auto flex flex-col items-center sm:px-8 md:px-20 lg:32-px xl:32-px">
 	<div class="">
 		<HeroSection />
 	</div>
