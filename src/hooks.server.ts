@@ -14,16 +14,21 @@ const supabaseHandle: Handle = async ({ event, resolve }) => {
       }
     }
   });
+  
+  if ('suppressGetSessionWarning' in event.locals.supabase.auth) {
+  // @ts-expect-error — internal flag
+  event.locals.supabase.auth.suppressGetSessionWarning = true;
+}
 
   event.locals.safeGetSession = async () => {
-    const { data: { session } } = await event.locals.supabase.auth.getSession();
-    if (!session) {
-      return { session: null, user: null };
-    }
     const { data: { user }, error } = await event.locals.supabase.auth.getUser();
     if (error || !user) {
       return { session: null, user: null };
     }
+    const { data: { session } } = await event.locals.supabase.auth.getSession();
+    // if (!session) {
+    //   return { session: null, user: null };
+    // }
     return { session, user };
   };
 

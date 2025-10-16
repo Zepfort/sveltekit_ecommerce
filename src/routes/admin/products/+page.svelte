@@ -5,7 +5,6 @@
 	import type { ActionResult } from '@sveltejs/kit';
 	import { invalidate, invalidateAll } from '$app/navigation';
 	import CurrencyInput from 'svelte-currency-input';
- 
 
 	let { data } = $props();
 	let { categories } = data;
@@ -121,17 +120,19 @@
 					enctype="multipart/form-data"
 					action={isEditing ? '?/updateProduct' : '?/createProduct'}
 					onsubmit={(e) => {
-					e.preventDefault();          // kalau memang ingin manual
-					handleSubmit(e);             // panggil fungsi Anda
-				}}
-				use:enhance  
+						e.preventDefault();
+						handleSubmit(e);
+					}}
+					
 				>
 					{#if isEditing}
 						<input type="hidden" name="id" value={editId} />
 					{/if}
 					<div class="space-y-4">
 						<div>
-							<label for="product_name" class="mb-1 block text-slate-700">Product Name<span class="text-red-700">*</span></label>
+							<label for="product_name" class="mb-1 block text-slate-700"
+								>Product Name<span class="text-red-700">*</span></label
+							>
 							<input
 								type="text"
 								id="product_name"
@@ -156,21 +157,22 @@
 
 						<div class="grid grid-cols-2 gap-4">
 							<div>
-								<label for="price" class="mb-1 block text-slate-700">Price<span class="text-red-700">*</span></label>
+								<label for="price" class="mb-1 block text-slate-700"
+									>Price<span class="text-red-700">*</span></label
+								>
 								<CurrencyInput
-									symbol="Rp"
-									symbolPosition="start"
-									id="price"
-									name="price"
 									bind:value={newPrice}
+									symbol="Rp"
 									currency="IDR"
 									locale="id-ID"
-									inputClasses={{ formatted: "currencyInput__formatted" }}
-									required
+									inputClasses={{ formatted: 'currencyInput__formatted' }}
 									/>
+									<input type="hidden" name="price" value={newPrice} />
 							</div>
 							<div>
-								<label for="stock" class="mb-1 block text-slate-700">Stock<span class="text-red-700">*</span></label>
+								<label for="stock" class="mb-1 block text-slate-700"
+									>Stock<span class="text-red-700">*</span></label
+								>
 								<input
 									type="number"
 									id="stock"
@@ -184,7 +186,9 @@
 						</div>
 
 						<div>
-							<label for="category" class="mb-1 block text-slate-700">Category<span class="text-red-700">*</span></label>
+							<label for="category" class="mb-1 block text-slate-700"
+								>Category<span class="text-red-700">*</span></label
+							>
 							<select
 								id="category"
 								name="category_id"
@@ -200,7 +204,9 @@
 						</div>
 
 						<div>
-							<label for="image_url" class="mb-1 block text-slate-700">Image<span class="text-red-700">*</span></label>
+							<label for="image_url" class="mb-1 block text-slate-700"
+								>Image<span class="text-red-700">*</span></label
+							>
 							<input
 								id="image_url"
 								name="image"
@@ -368,9 +374,9 @@
 
 <style>
 	.currencyInput__formatted {
-  width: 100%;
-  border: 1px solid #ccc;
-  border-radius: 0.375rem;
-  padding: 0.5rem;
-}
+		width: 100%;
+		border: 1px solid #ccc;
+		border-radius: 0.375rem;
+		padding: 0.5rem;
+	}
 </style>

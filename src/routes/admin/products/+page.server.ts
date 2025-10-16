@@ -103,7 +103,7 @@ export const actions: Actions = {
     const supabase = createSupabaseServerClient(event);
     const fd = await event.request.formData();
     const id = fd.get('id');
-    console.log('[DELETE] id dari form =', id); 
+    // console.log('[DELETE] id dari form =', id); 
 
     if (!id) return fail(400, { message: 'ID produk diperlukan' });
 
@@ -131,31 +131,32 @@ export const actions: Actions = {
 
   // Action update product
   updateProduct: async (event) => {
-    const supabase = createSupabaseServerClient(event);
-    const fd = await event.request.formData();
+  const supabase = createSupabaseServerClient(event);
+  const fd = await event.request.formData();
+  const id = String(fd.get('id') ?? '').trim();
+  const name = String(fd.get('name') ?? '').trim();
+  const description = String(fd.get('description') ?? '').trim();
+  const price = Number(fd.get('price')) || 0;
+  const stock = Number(fd.get('stock')) || 0;
+  const category_id = String(fd.get('category_id') ?? '');
+  const is_active = fd.get('is_active') === 'true';
+  const image = fd.get('image') as File | null;
 
-    const id = String(fd.get('id') ?? '').trim();
-    const name = String(fd.get('name') ?? '').trim();
-    const description = String(fd.get('description') ?? '').trim();
-    const price = Number(fd.get('price')) || 0;
-    const stock = Number(fd.get('stock')) || 0;
-    const category_id = String(fd.get('category_id') ?? '');
-    const is_active = fd.get('is_active') === 'true';
-    const image = fd.get('image') as File | null;
+  console.error('Parsed payload:', { name, price, stock, category_id, is_active, image });
 
-    if (!id) {
-      return fail(400, { message: 'ID produk wajib disertakan' });
-    }
-    if (!name || price <= 0 || !category_id) {
-      return fail(400, { message: 'Name, price, dan category wajib diisi' });
-    }
+  if (!id) {
+    return fail(400, { message: 'ID produk wajib disertakan' });
+  }
+  if (!name || price <= 0 || !category_id) {
+    return fail(400, { message: 'Name, price, dan category wajib diisi' });
+  }
 
-    const slug = name
+  const slug = name
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, '')
     .replace(/\s+/g, '-');
 
-    type ProductUpdate = {
+   type ProductUpdate = {
     name: string;
     slug: string;
     description: string;
@@ -166,8 +167,7 @@ export const actions: Actions = {
     image_url?: string;  // opsional
   }
 
-    // Tidak ubah gambar jika tidak update gambar
-    const updates: ProductUpdate = {
+const updates: ProductUpdate = {
       name,
       slug,
       description,
@@ -177,40 +177,45 @@ export const actions: Actions = {
       is_active
     };
 
-    if (image  && image.size > 0) {
-      // upload gambar baru & dapatkan URL public
-      const fileExt = image.name.split('.').pop();
-      const fileName = `${crypto.randomUUID()}.${fileExt}`;
-      const filePath = fileName;
+  if (image && image.size > 0) {
+    console.error('Image present, uploading...');
+    const fileExt = image.name.split('.').pop();
+    const fileName = `${crypto.randomUUID()}.${fileExt}`;
+    const filePath = fileName;
 
-      const { error: uploadError } = await supabase.storage
-        .from('product-images')
-        .upload(filePath, image, { upsert: true });
+    const { error: uploadError } = await supabase.storage
+      .from('product-images')
+      .upload(filePath, image, { upsert: true });
 
-      if (uploadError) {
-        return fail(400, { message: 'Gagal upload gambar: ' + uploadError.message });
-      }
-
-      const { data: publicUrlData } = supabase.storage
-        .from('product-images')
-        .getPublicUrl(filePath);
-
-      updates.image_url = publicUrlData.publicUrl;
+    if (uploadError) {
+      return fail(400, { message: 'Gagal upload gambar: ' + uploadError.message });
     }
 
-    console.log("Image from formData:", image);
+    const { data: publicUrlData } = supabase.storage
+      .from('product-images')
+      .getPublicUrl(filePath);
 
-    const { error } = await supabase
-      .from('products')
-      .update(updates)
-      .eq('id', id);
-
-    if (error) {
-      return fail(500, { message: 'Gagal memperbarui produk: ' + error.message });
-    }
-
-    throw redirect(303, '/admin/products');
+    updates.image_url = publicUrlData.publicUrl;
   }
+
+  console.error('Before update query, updates =', updates);
+
+  // lakukan update
+  const { error} = await supabase
+    .from('products')
+    .update(updates)
+    .eq('id', id)
+    .select(); 
+
+  if (error) {
+    console.error('UPDATE failed with error:', error.message);
+    return fail(500, { message: 'Gagal memperbarui produk: ' + error.message });
+  }
+
+  console.error('UPDATE succeeded, redirecting...');
+  throw redirect(303, '/admin/products');
+}
+
 }
 
 
