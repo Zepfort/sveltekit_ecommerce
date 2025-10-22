@@ -12,8 +12,8 @@
   {#each mainCategories as cat}
     <li>
       <a
-        href={`/products/category/${cat.slug}`}
-        class="block px-3 py-1 rounded hover:bg-gray-100 transition"
+        href={`/product/category/${cat.slug}`}
+        class="block px-3 py-1 text-sm font-semibold rounded hover:bg-gray-200 transition"
         onmouseenter={() => onHover(cat.id)}
       >
         {cat.name}

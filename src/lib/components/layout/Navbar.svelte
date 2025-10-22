@@ -6,9 +6,9 @@
 	import CartButton from '../../components/CartButton.svelte';
 	import { writable } from 'svelte/store';
 	import CategoriesModal from '$lib/components/categories/CategoriesModal.svelte';
-    import type { Category } from '$lib/types/category';
+	import type { Category } from '$lib/types/category';
 
-	// Props 
+	// Props
 	const { mainCategories, subCategories, userProfile } = $props<{
 		mainCategories: Category[];
 		subCategories: Category[];
@@ -16,19 +16,18 @@
 	}>();
 
 	const showModal = writable(false);
-    let hoverTimeout: ReturnType<typeof setTimeout> | undefined
+	let hoverTimeout: ReturnType<typeof setTimeout> | undefined;
 
 	function handleMouseEnter() {
 		clearTimeout(hoverTimeout);
-        showModal.set(true)
+		showModal.set(true);
 	}
 
-    function handleMouseLeave() {
-        hoverTimeout = setTimeout(() => {
-            showModal.set(false);
-        }, 200);
-    }
-    
+	function handleMouseLeave() {
+		hoverTimeout = setTimeout(() => {
+			showModal.set(false);
+		}, 200);
+	}
 </script>
 
 <!-- 🔽 Template -->
@@ -38,26 +37,31 @@
 			<h1 class="text-2xl font-bold text-white">RenzMart</h1>
 		</div>
 
-        <div class="relative">
-            <div
-                role="button"
-                tabindex="0"
-                onmouseenter={handleMouseEnter} 
-            >
-                <button
-                    class="col-bg-primary flex w-12 cursor-pointer items-center justify-center rounded-md px-12 py-1.5"
-                >
-                    Kategori
-                </button>
-            </div>
-        </div>
+			<div class="relative" role="button" tabindex="0" onmouseenter={handleMouseEnter}>
+				<button
+					class="col-bg-primary flex w-6 sm:w-8 lg:w-12 cursor-pointer items-center justify-center rounded-md px-12 py-1.5"
+				>
+					Kategori
+				</button>
+				{#if $showModal}
+					<div
+						role="button"
+						tabindex="0"
+						class="absolute top-16 z-50 mt-0 w-[40rem]"
+						onmouseenter={handleMouseEnter}
+						onmouseleave={handleMouseLeave}
+					>
+						<CategoriesModal {mainCategories} {subCategories} />
+					</div>
+				{/if}
+			</div>
 
 		<div>
 			<form>
 				<div class="flex gap-0 rounded-lg bg-white">
 					<input
 						type="text"
-						class="min-w-[600px] rounded-sm border-none outline-none"
+						class="w-full sm:w-[70%] lg:min-w-[600px] rounded-sm border-none outline-none"
 						placeholder="Cari di Renzmart"
 					/>
 					<button
@@ -84,14 +88,3 @@
 		</div>
 	</div>
 </div>
-
-{#if $showModal}
-    <div
-        role="button"
-        tabindex="0" 
-        class="absolute left-0 mt-2 w-[70vw] max-w-6xl z-50"
-        onmouseenter={handleMouseEnter}
-        onmouseleave={handleMouseLeave}>
-        <CategoriesModal {mainCategories} {subCategories} />
-    </div>
-{/if}

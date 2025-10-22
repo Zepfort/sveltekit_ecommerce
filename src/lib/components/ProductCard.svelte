@@ -11,7 +11,7 @@
         <img src={product.image_url} alt={product.name} class="card-image"/>
     </div>
     <div class="p-2">
-        <h3 class="font-light text-base m=0">{product.name}</h3>
+        <h3 class="font-light text-base m-0 truncate">{product.name}</h3>
         <p class="card-price">Rp{product.price.toLocaleString('id-ID')}</p>
         <div class="flex py-0.5 pl-0 items-center"> 
             <Icon icon="meteocons:star-fill" width="28" height="28" />

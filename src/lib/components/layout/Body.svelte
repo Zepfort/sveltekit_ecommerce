@@ -7,8 +7,8 @@
 	export let products: ProductListItem[];
 </script>
 
-<div class="container mx-auto flex flex-col items-center sm:px-8 md:px-20 lg:32-px xl:32-px">
-	<div class="">
+<div class="container mx-0 flex flex-col items-center sm:px-4 md:px-16 lg:px-20 xl:px-24">
+	<div class="z-1">
 		<HeroSection />
 	</div>
 	<div class="flex w-full py-2 pl-2">

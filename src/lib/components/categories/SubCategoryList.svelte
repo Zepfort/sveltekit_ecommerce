@@ -19,7 +19,7 @@
 			<li>
 				<a
 					href={`/product/subcategory/${sub.slug}`}
-					class="block cursor-pointer px-3 py-1 rounded hover:bg-gray-100 transition"
+					class="block cursor-pointer px-3 py-1 font-semibold text-sm rounded hover:bg-gray-200 transition"
 					onclick={(e) => {
 						e.preventDefault();
 						onSelect(sub.slug);

@@ -33,7 +33,7 @@
 {#if 'href' in props}
   <a
     href={props.href}
-    class="btn"
+    class="btn "
     class:btn-secondary={props.isSecondary}
     class:btn-danger={props.isDanger}
     class:btn-menu={props.isMenu}

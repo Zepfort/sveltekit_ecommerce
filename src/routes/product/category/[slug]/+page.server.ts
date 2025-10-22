@@ -1,14 +1,12 @@
-// src/routes/products/category/[slug]/+page.server.ts
-
+// src/routes/product/category/[slug]/+page.server.ts
 import { createSupabaseServerClient } from '$lib/supabaseServer';
 import { error } from '@sveltejs/kit';
 
 export const load = async (event) => {
-  const { params } = event;
-  const { slug } = params;
+  const { slug } = event.params;
   const supabase = createSupabaseServerClient(event);
 
-  // Ambil kategori berdasarkan slug
+  // Ambil kategori utama berdasarkan slug
   const { data: category, error: catError } = await supabase
     .from('categories')
     .select('*')
@@ -16,14 +14,28 @@ export const load = async (event) => {
     .single();
 
   if (catError || !category) {
+    console.error('Category fetch error:', catError);
     throw error(404, `Kategori dengan slug "${slug}" tidak ditemukan.`);
   }
 
-  // Ambil produk berdasarkan category_id
+  // Ambil semua subkategori dari kategori ini
+  const { data: subcategories, error: subcatError } = await supabase
+    .from('categories')
+    .select('id')
+    .eq('parent_id', category.id);
+
+  if (subcatError) {
+    console.error('Error fetching subcategories:', subcatError.message);
+  }
+
+  // Kumpulkan semua id (kategori utama + subkategori)
+  const categoryIds = [category.id, ...(subcategories?.map((sc) => sc.id) ?? [])];
+
+  // Ambil semua produk dari kategori utama dan subkategori-nya
   const { data: products, error: prodError } = await supabase
     .from('products')
     .select('*')
-    .eq('category_id', category.id)
+    .in('category_id', categoryIds)
     .eq('is_active', true)
     .order('created_at', { ascending: false });
 
@@ -31,8 +43,5 @@ export const load = async (event) => {
     console.error('Error fetching products:', prodError.message);
   }
 
-  return {
-    category,
-    products
-  };
+  return { category, products };
 };
