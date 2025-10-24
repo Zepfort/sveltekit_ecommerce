@@ -112,10 +112,10 @@
 	<h2 class="text-2xl font-bold text-slate-900">Products</h2>
 
 	<!-- Add Product -->
-	<div class="mb-4 flex items-center justify-between">
+	<div class="mb-4 flex px-0 items-center justify-between">
 		<button
 			onclick={handleAddProduct}
-			class="col-bg-primary flex items-center gap-2 rounded-lg px-4 py-2 text-lg shadow transition"
+			class="col-bg-primary flex items-center gap-2 rounded-lg px-8 py-2 text-lg shadow transition"
 		>
 			<Icon icon="mdi:plus" width="20" height="20" /> New Product
 		</button>
@@ -342,7 +342,7 @@
 							<tr class="border-b hover:bg-gray-50">
 								<td class="px-4 py-2">
 									{#if p.image_url}
-										<img src={p.image_url} alt={p.name} class="h-12 w-12 rounded object-cover" />
+										<img src={p.image_url} alt={p.name} class="h-18 w-20 rounded object-cover" />
 									{:else}
 										<span class="text-gray-400">No Image</span>
 									{/if}

@@ -2,10 +2,11 @@
     import { onMount, onDestroy } from 'svelte';
     import Banner1 from '../assets/Banner/Banner_1.png';
     import Banner2 from '../assets/Banner/Banner_2.png';
+    import Banner3 from '../assets/Banner/Banner_3.png'
     // import Banner3 from '../assets/Banner/Banner_3.png';
 
     let currentImageIndex = 0;
-    const images = [Banner1, Banner2];
+    const images = [Banner1, Banner2, Banner3];
     let intervalId: ReturnType<typeof setInterval> | undefined;
 
     function changeImage() {
@@ -44,7 +45,7 @@
       <img 
         src={image} 
         alt="Promo Banner" 
-        class="w-full h-auto rounded object-cover"
+        class="w-[400px] h-[200px] rounded object-cover"
       />
     {/each}
   </div>

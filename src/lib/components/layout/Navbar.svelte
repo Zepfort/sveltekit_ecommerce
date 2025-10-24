@@ -43,7 +43,7 @@
 <div class="mx-auto flex w-full justify-center bg-gray-950">
   <div class="container flex items-center justify-between bg-gray-950 px-7 py-4">
     <div class="logo">
-      <h1 class="text-2xl font-bold text-white">RenzMart</h1>
+      <a href="/" class="text-2xl font-bold text-white">RenzMart</a>
     </div>
 
     <div class="relative" role="button" tabindex="0" onmouseenter={handleMouseEnter}>

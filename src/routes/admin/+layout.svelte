@@ -40,9 +40,9 @@
 	}
 </script>
 
-<div class="flex min-h-screen w-full bg-white text-gray-900">
+<div class="flex w-full bg-white text-gray-900">
 	<!-- Sidebar -->
-	<aside class="flex w-72 flex-col bg-[#07071a] text-white">
+	<aside class="fixed flex w-72 h-screen flex-col bg-[#07071a] text-white">
 		<div class="border-b border-white/6 px-6 py-5">
 			<a href="/" class="flex items-center gap-3">
 				<div class="text-2xl font-extrabold">RenzMart</div>
@@ -73,10 +73,10 @@
 	</aside>
 
 	<!-- Main content -->
-	<main class="min-h-screen flex-1">
+	<main class="h-screen ml-72 w-full">
 		<!-- topbar -->
 		<header
-			class="flex items-center justify-between sticky border-b border-white/6 bg-[#050417] px-6 py-3 text-white"
+			class="fixed flex left-72 right-0 items-center justify-between border-b border-white/6 bg-[#050417] px-6 py-3 text-white"
 		>
 			<div class="flex items-center gap-4">
 				<div class="text-lg font-semibold">Admin Panel</div>

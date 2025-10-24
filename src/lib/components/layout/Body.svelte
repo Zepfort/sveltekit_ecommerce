@@ -11,8 +11,8 @@
 	<div class="z-1">
 		<HeroSection />
 	</div>
-	<div class="flex w-full py-2 pl-2">
-		<h1 class="text-2xl font-bold text-gray-950">For You</h1>
+	<div class="flex w-full pt-16 pl-16">
+		<h1 class="text-2xl font-bold text-gray-950">Produk Terbaru</h1>
 	</div>
 	<div class="product-list grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
 		{#each products as p}
@@ -22,8 +22,7 @@
 					name: p.name,
 					slug: p.slug,
 					price: p.price,
-					image_url: p.image_url, // sudah sesuai tipe
-					rating: p.rating ?? 0,
+					image_url: p.image_url, 
 					sold: p.sold ?? 0
 				}}
 			/>
@@ -33,6 +32,6 @@
 
 <style>
 	.product-list {
-		padding: 0.5rem;
+		padding: 1rem 0;
 	}
 </style>
