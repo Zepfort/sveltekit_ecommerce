@@ -1,63 +1,166 @@
 <script lang="ts">
-  import Icon from '@iconify/svelte'
-  export let data;
-  const { items, total } = data;
+	import Icon from '@iconify/svelte';
+  import { page } from '$app/state';
+
+  type ItemType = {
+    id: string;
+    name: string;
+    price: number;
+    qty: number;
+    image_url?: string;
+  };
+
+  type CheckoutData = {
+  items: ItemType[];
+  total: number;   
+  fromCart?: boolean;
+};
+
+	let { data }: { data?: CheckoutData } = $props();
+let items = $state<ItemType[]>([]);
+let total = $state(0);
+let fromCart = $state(false);
+
+if (data && data.items?.length) {
+  items = data.items;
+  total = data.total;
+  fromCart = data.fromCart ?? false;
+} else {
+  // fallback ke client navigasi‐state
+  const nav = $derived(page.state as { items?: ItemType[]; total?: number; fromCart?: boolean } ?? {});
+
+  $effect(() => {
+    if(!data) {
+      items = nav.items ?? [];
+      total = nav.total ?? 0;
+      fromCart = nav.fromCart ?? false;
+    }
+  })
+}
+	let grandTotal = $derived(
+  fromCart
+    ? items.reduce((sum, it) => sum + it.price * it.qty, 0)
+    : total
+);
 </script>
 
-<div class="container mx-auto py-8 px-4">
-  <h1 class="text-2xl font-bold mb-4">Checkout</h1>
+<div class="container mx-auto px-4 py-8">
+	<h1 class="mb-4 text-2xl font-bold">Checkout</h1>
 
-  {#if items.length > 0}
-      {#each items as it}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-          <!-- Kiri -->
-           <div class="flex flex-col gap-4">
-            <div class="flex flex-col items-start border rounded-lg shadow-md p-4">
-              <h2 class="text-gray-500 text-xl font-semibold pl-1">Alamat Pengiriman</h2>
-              <div class="flex pt-2 gap-1">
-                <Icon icon="mdi:location" width="20" height="24"  style="color: #0443F2;"/>
-                <p class="font-normal">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus, accusamus?</p>
-              </div>
-            </div>
-             <div class="flex flex-col items-center border rounded-lg shadow-md p-4">
-               <img src={it.image_url} alt={it.name} class="w-full max-w-sm rounded-md object-contain">
-               <h2 class="text-lg font-medium mt-4 text-center">{it.name}</h2>
-               <p class="text-gray-700 text-md mt-1">Jumlah: {it.qty}</p>
-             </div>
-           </div>
-          
-
-          <!-- Kanan -->
-           <div class="bg-gray-50 border rounded-lg shadow-md p-6 flex flex-col justify-between h-full">
-              <div>
-                <h3 class="text-lg font-semibold mb-4">Ringkasan Pesanan</h3>
-                <div class="flex justify-between mb-2">
-                  <span>Harga</span>
-                  <span>Rp {Number(it.price).toLocaleString('id-ID')}</span>
-                </div>
-                <div class="flex justify-between mb-2">
-                  <span>Jumlah</span>
-                  <span>{it.qty}</span>
-                </div>
-                <hr class="my-4">
-                <div class="flex justify-between text-xl font-bold">
-                  <span>Total</span>
-                  <span>Rp {(Number(it.price) * it.qty).toLocaleString('id-ID')}</span>
-                </div>
-              </div>
-              <!-- Form alamat, metode pembayaran, tombol konfirmasi, dsb -->
-              <button class="mt-6 w-full py-3 bg-blue-600 text-white rounded-lg">
-                Bayar Sekarang
-              </button>
-          
-           </div>
+	{#if items.length > 0}
+		{#if fromCart}
+			<!-- Mode Keranjang -->
+  <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+    <!-- KIRI: daftar produk -->
+    <div class="flex flex-col gap-4">
+      <!-- Alamat pengiriman -->
+      <div class="flex flex-col items-start rounded-lg border p-4 shadow-md">
+        <h2 class="pl-1 text-xl font-semibold text-gray-500">Alamat Pengiriman</h2>
+        <div class="flex gap-1 pt-2">
+          <Icon icon="mdi:location" width="20" height="24" style="color: #0443F2;" />
+          <p class="font-normal">
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus, accusamus?
+          </p>
         </div>
-      {/each}
-      
-      
-    
-    
-  {:else}
-    <p>Keranjang kosong atau tidak ada item untuk checkout.</p>
-  {/if}
+      </div>
+
+      <!-- Daftar produk -->
+      <ul class="space-y-4">
+        {#each items as it (it.id)}
+          <li class="flex items-center gap-4 rounded border p-3 shadow-sm">
+            <img src={it.image_url} alt={it.name} class="h-16 w-16 rounded-sm object-cover" />
+            <div class="flex-1">
+              <p class="font-medium">{it.name}</p>
+              <p class="text-sm text-gray-600">Jumlah: {it.qty}</p>
+              <p class="text-sm text-gray-600">
+                Rp {(it.price * it.qty).toLocaleString('id-ID')}
+              </p>
+            </div>
+          </li>
+        {/each}
+      </ul>
+    </div>
+
+    <!-- KANAN: ringkasan pesanan -->
+    <div class="flex h-fit flex-col justify-between rounded-lg border bg-gray-50 p-6 shadow-md">
+      <div>
+        <h3 class="mb-4 text-lg font-semibold">Ringkasan Pesanan</h3>
+        {#each items as it (it.id)}
+          <div class="mb-2 flex justify-between text-sm">
+            <span>{it.name} x{it.qty}</span>
+            <span>Rp {(it.price * it.qty).toLocaleString('id-ID')}</span>
+          </div>
+        {/each}
+        <hr class="my-4" />
+        <div class="flex justify-between text-xl font-bold">
+          <span>Total</span>
+          <span>Rp {grandTotal.toLocaleString('id-ID')}</span>
+        </div>
+      </div>
+
+      <button
+        class="mt-6 w-full rounded-lg bg-blue-600 py-3 text-white transition hover:bg-blue-700"
+      >
+        Bayar Sekarang
+      </button>
+    </div>
+  </div>
+		{:else}
+			<!-- Mode Beli Langsung -->
+			{#each items as it (it.id)}
+				<div class="grid grid-cols-1 items-start gap-8 md:grid-cols-2">
+					<!-- Kiri -->
+					<div class="flex flex-col gap-4">
+						<div class="flex flex-col items-start rounded-lg border p-4 shadow-md">
+							<h2 class="pl-1 text-xl font-semibold text-gray-500">Alamat Pengiriman</h2>
+							<div class="flex gap-1 pt-2">
+								<Icon icon="mdi:location" width="20" height="24" style="color: #0443F2;" />
+								<p class="font-normal">
+									Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus, accusamus?
+								</p>
+							</div>
+						</div>
+
+						<div class="flex flex-col items-center rounded-lg border p-4 shadow-md">
+							<img
+								src={it.image_url}
+								alt={it.name}
+								class="w-full max-w-sm rounded-md object-contain"
+							/>
+							<h2 class="mt-4 text-center text-lg font-medium">{it.name}</h2>
+							<p class="text-md mt-1 text-gray-700">Jumlah: {it.qty}</p>
+						</div>
+					</div>
+
+					<!-- Kanan -->
+					<div
+						class="flex h-full flex-col justify-between rounded-lg border bg-gray-50 p-6 shadow-md"
+					>
+						<div>
+							<h3 class="mb-4 text-lg font-semibold">Ringkasan Pesanan</h3>
+							<div class="mb-2 flex justify-between">
+								<span>Harga</span>
+								<span>Rp {Number(it.price).toLocaleString('id-ID')}</span>
+							</div>
+							<div class="mb-2 flex justify-between">
+								<span>Jumlah</span>
+								<span>{it.qty}</span>
+							</div>
+							<hr class="my-4" />
+							<div class="flex justify-between text-xl font-bold">
+								<span>Total</span>
+								<span>Rp {(Number(it.price) * it.qty).toLocaleString('id-ID')}</span>
+							</div>
+						</div>
+						<!-- Form alamat, metode pembayaran, tombol konfirmasi, dsb -->
+						<button class="mt-6 w-full rounded-lg bg-blue-600 py-3 text-white">
+							Bayar Sekarang
+						</button>
+					</div>
+				</div>
+			{/each}
+		{/if}
+	{:else}
+		<p>Keranjang kosong atau tidak ada item untuk checkout.</p>
+	{/if}
 </div>

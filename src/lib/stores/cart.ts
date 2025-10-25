@@ -1,4 +1,4 @@
-import { writable, derived } from 'svelte/store';
+import { writable, derived, get } from 'svelte/store';
 
 export type CartItem = {
   id: string;
@@ -8,6 +8,7 @@ export type CartItem = {
   qty: number;
   slug: string;
   image_url: string;
+  selected?: boolean;
 };
 
 export const cart = writable<CartItem[]>([]);
@@ -30,7 +31,11 @@ export async function loadCart() {
     console.warn('loadCart got no JSON', e);
     return;
   }
-  cart.set(j.items ?? []);
+  const items = (j.items ?? []).map((it: CartItem) => ({
+    ...it,
+    selected: it.selected ?? true
+  }))
+  cart.set(items)
 }
 
 export async function addToCart(productId: string, qty: number) {
@@ -50,12 +55,17 @@ export async function addToCart(productId: string, qty: number) {
     console.warn('addToCart got no JSON', e);
   }
   if (data?.items) {
-    cart.set(data.items);
+    const items = data.items.map((it: CartItem) => ({
+      ...it,
+      selected: it.selected ??  true
+    }));
+    cart.set(items)
   }
   return data;
 }
 
 export async function updateCartItem(itemId: string, qty: number) {
+  const prev = get(cart)
   const res = await fetch(`/api/cart/${itemId}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
@@ -65,6 +75,12 @@ export async function updateCartItem(itemId: string, qty: number) {
     console.error('updateCartItem failed', await res.text());
   }
   await loadCart();
+  cart.update(newItems => 
+    newItems.map(it => ({
+      ...it,
+      selected: prev.find(p => p.id === it.id)?.selected ?? true
+    }))
+  )
 }
 
 export async function removeCartItem(itemId: string) {
@@ -75,4 +91,18 @@ export async function removeCartItem(itemId: string) {
     console.error('removeCartItem failed', await res.text());
   }
   await loadCart();
+}
+
+export function toggleSelectItem(itemId: string) {
+  cart.update(items => 
+    items.map(it => 
+      it.id === itemId ? { ...it, selected: !it.selected } : it
+    )
+  )
+}
+
+export function selectAll(select: boolean) {
+  cart.update(items => 
+    items.map(it => ({ ...it, selected: select}))
+  )
 }

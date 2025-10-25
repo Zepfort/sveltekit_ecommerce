@@ -23,11 +23,11 @@
   }
 </script>
 
-<div class="flex items-center justify-center border-[1px] border-gray-300 rounded-lg h-8 w-28 select-none">
+<div class="flex items-center justify-center border-[1px] rounded-sm h-8 w-28 select-none">
   <button
     onclick={decrement}
     disabled={qty <= 1}
-    class="flex flex-1 h-full rounded-l-lg items-center justify-center
+    class="flex flex-1 h-full rounded-l-lg border-r items-center justify-center
            text-xl font-light text-gray-700
            hover:bg-gray-200 active:bg-gray-300
            disabled:text-gray-400 disabled:cursor-not-allowed
@@ -40,7 +40,7 @@
   </span>
   <button
     onclick={increment}
-    class="flex flex-1 h-full rounded-r-lg items-center justify-center
+    class="flex flex-1 h-full rounded-r-lg border-l items-center justify-center
            text-xl font-light text-gray-700
            hover:bg-gray-200 active:bg-gray-300
            transition"
