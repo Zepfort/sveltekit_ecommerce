@@ -1,7 +1,6 @@
 import { error } from '@sveltejs/kit';
 import { createSupabaseServerClient } from '$lib/supabaseServer';
 import type { PageServerLoad } from './$types';
-import type { CartItem } from '$lib/stores/cart';
 
 export const load: PageServerLoad = async (event) => {
   const supabase = createSupabaseServerClient(event);
@@ -12,7 +11,7 @@ export const load: PageServerLoad = async (event) => {
   const qtyParam = url.searchParams.get('qty');
   const qty = qtyParam ? parseInt(qtyParam) : 1;
 
-  let items: Array<{ id: string; name: string; price: number; qty: number }> = [];
+  let items: Array<{ id: string; name: string; image_url: string; price: number; qty: number }> = [];
 
   if (slug) {
     // mode beli langsung: fetch produk berdasarkan slug
@@ -34,6 +33,7 @@ export const load: PageServerLoad = async (event) => {
       {
         id: data.id,
         name: data.name,
+        image_url: data.image_url,
         // convert price jika perlu
         price: typeof data.price === 'number' ? data.price : parseFloat(data.price ),
         qty
