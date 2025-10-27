@@ -16,27 +16,28 @@
   fromCart?: boolean;
 };
 
-	let { data }: { data?: CheckoutData } = $props();
-let items = $state<ItemType[]>([]);
-let total = $state(0);
-let fromCart = $state(false);
+	let { items: initialItems = [], total: initialTotal = 0, fromCart: initialFromCart = false }: CheckoutData = $props();
+  let items = $state<ItemType[]>(initialItems);
+  let total = $state<number>(initialTotal);
+  let fromCart = $state<boolean>(initialFromCart);
 
-if (data && data.items?.length) {
-  items = data.items;
-  total = data.total;
-  fromCart = data.fromCart ?? false;
-} else {
-  // fallback ke client navigasi‐state
-  const nav = $derived(page.state as { items?: ItemType[]; total?: number; fromCart?: boolean } ?? {});
+  const nav = $derived(() => {
+    const s = page.state as { items?: ItemType[]; total?: number; fromCart?: boolean} | undefined;
+    return {
+      items: s?.items ?? [],
+      total: s?.total ?? 0,
+      fromCart: s?.fromCart ?? false
+    };
+  });
 
-  $effect(() => {
-    if(!data) {
-      items = nav.items ?? [];
-      total = nav.total ?? 0;
-      fromCart = nav.fromCart ?? false;
-    }
-  })
-}
+$effect(() => {
+  if (initialItems.length === 0) {
+    items = nav().items;
+    total = nav().total;
+    fromCart = nav().fromCart;
+  }
+})
+
 	let grandTotal = $derived(
   fromCart
     ? items.reduce((sum, it) => sum + it.price * it.qty, 0)

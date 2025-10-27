@@ -39,6 +39,7 @@ async function inc(id: string) {
 
   const newQty = item.qty + 1;
   await updateCartItem(id, newQty); // API call ke Supabase
+  await loadCart();
 }
 
 async function dec(id: string) {
@@ -48,8 +49,10 @@ async function dec(id: string) {
   if (item.qty > 1) {
     const newQty = item.qty - 1;
     await updateCartItem(id, newQty);
+    await loadCart();
   } else {
     await removeCartItem(id);
+    await loadCart();
   }
 }
 
@@ -105,7 +108,7 @@ function handleCheckout() {
     <!-- pop up panel -->
     <div 
       class="fixed sm:absolute sm:-right-40 bottom-0 sm:bottom-auto
-             w-full sm:w-[28rem] md:w-[36rem] 
+             w-full sm:w-[28rem] md:w-[38rem] 
              h-[80vh] sm:h-auto bg-white border 
              shadow-xl rounded-t-lg sm:rounded-sm 
              p-4 z-50 transition-all duration-300 
