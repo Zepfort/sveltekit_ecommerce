@@ -26,8 +26,7 @@
 
 	type ComponentProps = ButtonProps | LinkProps;
 
-	 let props: ComponentProps = $props();
-	// let { children, href, isSecondary, isDanger, isMenu, onclick, ...props }: ComponentProps = $props();
+	let props: ComponentProps = $props();
 </script>
 
 {#if 'href' in props}
