@@ -18,9 +18,10 @@
 	}
 </script>
 
-<div class="flex min-h-screen w-full bg-gray-50">
+<div class="flex min-h-screen w-full bg-gray-50 overflow-x-hidden">
 	<!-- Sidebar -->
-	<aside class="fixed flex h-screen w-72 flex-col bg-gray-950 text-white">
+	<aside class="fixed inset-y-0 left-0 z-20 flex h-full w-72 flex-col bg-gray-950 text-white transform transition-transform duration-300 ease-in-out
+		       -translate-x-full md:translate-x-0 md:w-72">
 		<div class="border-b border-gray-800 p-6">
 			<div class="flex items-center space-x-3">
 				<Icon icon="mdi:account-circle" width="48" height="48" class="text-gray-400" />
@@ -44,7 +45,7 @@
 				<span class="text-center">Profile</span>
 			</a>
 
-			<a
+			<!-- <a
 				href="/profile/address"
 				class="flex items-center gap-3 rounded px-4 py-2 transition hover:bg-gray-800"
 			>
@@ -56,7 +57,7 @@
 					class="mr-3 align-middle inline-flex"
 				/>
 				<span>Alamat Saya</span>
-			</a>
+			</a> -->
 
 			<a href="/" class="flex items-center gap-3 rounded px-4 py-2 transition hover:bg-gray-800">
 				<Icon
@@ -81,7 +82,7 @@
 	</aside>
 
 	<!-- Main Content -->
-	<main class="flex-1 p-8">
+	<main class="flex-1 px-6">
 		{@render children?.()}
 	</main>
 </div>
