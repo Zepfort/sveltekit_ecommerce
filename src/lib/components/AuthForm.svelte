@@ -38,7 +38,7 @@
 			<div
 				class="flex max-w-[400px] min-w-[400px] flex-col rounded-sm border-t-2 border-t-blue-700 px-8 py-8 shadow-2xl"
 			>
-				<h1 class="text-center text-3xl font-normal">{isRegistration ? 'Register' : 'Login'}</h1>
+				<h1 class="text-center text-3xl font-normal">{isRegistration ? 'Daftar Akun' : 'Masuk'}</h1>
 				<div class="flex flex-col items-center pt-8">
 					<div class="flex w-full flex-col justify-center pb-12">
 						{#if isRegistration}

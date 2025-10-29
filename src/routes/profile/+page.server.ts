@@ -1,4 +1,3 @@
-// src/routes/profile/+page.server.ts
 import type { PageServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
 
@@ -9,10 +8,20 @@ export const load: PageServerLoad = async ({ locals }) => {
     throw redirect(303, '/login');
   }
 
-  // Ambil profil dari tabel users
+  // Ambil profil
   const { data: userProfile, error } = await locals.supabase
     .from('users')
-    .select('id, name, email, created_at')
+    .select(`
+      id,
+      name,
+      email,
+      created_at,
+      provinsi,
+      kabupaten_kota,
+      kecamatan,
+      desa_kelurahan,
+      alamat_jalan,
+      kode_pos`)
     .eq('id', user.id)
     .single();
 
@@ -23,13 +32,5 @@ export const load: PageServerLoad = async ({ locals }) => {
       error: new Error('Gagal memuat profil')
     };
   }
-
-  return {
-    userProfile: {
-    id: userProfile.id,
-    name: userProfile.name,
-    email: userProfile.email,
-    created_at: userProfile.created_at  // pastikan ini
-  }
-  };
+   return { userProfile };
 };
