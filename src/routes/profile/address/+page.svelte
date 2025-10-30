@@ -1,5 +1,5 @@
 <script lang="ts">
-  // Props dengan runes mode
+  // props
   interface Props {
     data: {
       address: {
@@ -14,7 +14,7 @@
   }
   let { data }: Props = $props();
 
-  // Jika data.address null, kita inisialisasi form kosong
+  // form kosong
   let form = {
     provinsi: data.address?.provinsi ?? '',
     kabupaten_kota: data.address?.kabupaten_kota ?? '',
@@ -80,14 +80,13 @@
       
           <div class="md:col-span-2 flex flex-col">
             <label for="alamat_jalan" class="text-sm font-medium text-gray-700 mb-1">Alamat Jalan</label>
-            <input
+            <textarea
               id="alamat_jalan"
               name="alamat_jalan"
-              type="text"
               bind:value={form.alamat_jalan}
               placeholder="Contoh: Jl. Affandi No. 23"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
+              class="w-full md:w-92 resize-y px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            ></textarea>
           </div>
       
           <div class="md:col-span-2 flex flex-col">
@@ -98,14 +97,14 @@
               type="text"
               bind:value={form.kode_pos}
               placeholder="Contoh: 55281"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              class="w-[20rem] px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
       
           <div class="md:col-span-2 flex justify-end mt-4">
             <button
               type="submit"
-              class="px-8 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition"
+              class="px-8 py-2 text-white font-medium rounded-sm col-bg-admin focus:ring-4 focus:ring-blue-300 transition"
             >
               {data.address ? 'Perbarui Alamat' : 'Tambah Alamat'}
             </button>
@@ -113,3 +112,13 @@
         </form>
     </div>
 </section>
+
+<style>
+  .col-bg-admin{
+    background-color: #0443F2;
+  }
+
+  .col-bg-admin:hover {
+    background-color: #0433C2;
+  }
+</style>

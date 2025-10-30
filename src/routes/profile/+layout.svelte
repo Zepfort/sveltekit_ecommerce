@@ -35,7 +35,7 @@
 		<nav class="flex-1 space-y-2 p-4">
 			<a
 				href="/profile"
-				class="flex items-center gap-3 rounded px-4 py-2 leading-none transition hover:bg-gray-800"
+				class="flex items-center gap-3 rounded-sm px-4 py-2 leading-none transition col-bg-primary"
 			>
 				<Icon icon="famicons:home" 
 					width="20" 
@@ -59,7 +59,7 @@
 				<span>Alamat Saya</span>
 			</a> -->
 
-			<a href="/" class="flex items-center gap-3 rounded px-4 py-2 transition hover:bg-gray-800">
+			<a href="/" class="flex items-center gap-3 rounded-sm px-4 py-2 transition col-bg-admin">
 				<Icon
 					icon="pajamas:go-back"
 					width="20"
@@ -73,7 +73,7 @@
 			<button
 				type="button"
 				onclick={handleLogout}
-				class="flex w-full items-center gap-3 rounded px-4 py-2 text-left transition hover:bg-gray-800"
+				class="flex w-full items-center gap-3 rounded-sm px-4 py-2 text-left transition col-bg-primary"
 			>
 				<Icon icon="mdi:logout" width="20" height="20" />
 				<span>Log Out</span>
@@ -87,4 +87,12 @@
 	</main>
 </div>
 
-<style></style>
+<style>
+	.col-bg-primary{
+		background-color: transparent;
+	}
+
+	.col-bg-primary:hover{
+		background-color: #0443F2;
+	}
+</style>

@@ -15,7 +15,6 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   if (error) {
     console.error('Error fetch userAddress:', error);
-    // kita bisa tetap lanjut dengan data null
   }
 
   return { 
@@ -50,6 +49,6 @@ export const actions: Actions = {
       return { status: 500, error: new Error('Gagal simpan alamat') };
     }
 
-    return { success: true };
+    throw redirect(303, '/profile')
   }
 };

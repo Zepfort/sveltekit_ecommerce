@@ -21,3 +21,6 @@ select:focus {
     box-shadow: none;
 }
 
+:root {
+  --color-primary: #0443F2;
+}
