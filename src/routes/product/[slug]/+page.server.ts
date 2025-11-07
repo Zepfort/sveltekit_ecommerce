@@ -1,5 +1,3 @@
-// src/routes/product/[slug]/+page.server.ts
-
 import { error } from '@sveltejs/kit';
 import { createSupabaseServerClient } from '$lib/supabaseServer';  // path menyesuaikan
 import type { PageServerLoad } from './$types';
@@ -17,7 +15,7 @@ export const load: PageServerLoad = async (event) => {
     .from('products')
     .select('*')
     .eq('slug', slug)
-    .maybeSingle();  // hanya satu record diharapkan
+    .maybeSingle();  
 
   if (fetchError) {
     console.error('Error fetching product', fetchError);
@@ -35,16 +33,14 @@ export const load: PageServerLoad = async (event) => {
     name: data.name,
     slug: data.slug,
     description: data.description,
-    price: parseFloat(data.price as unknown as string),  // karena `numeric`
+    price: parseFloat(data.price as unknown as string),  
     stock: data.stock,
-    image_url: data.image_url ?? '',  // atau default
+    image_url: data.image_url ?? '',  
     isActive: data.is_active,
     category_id: data.category_id,
     createdAt: data.created_at,
     updatedAt: data.updated_at,
 
-    // jika kamu punya field tambahan seperti sold, rating, condition, min_order, from, dsb,
-    // dan data itu ada di tabel atau di join tabel lain, kamu perlu join / query tambahan di sini
     sold: (data).sold ?? 0,
     rating: (data).rating ?? 0,
     condition: (data).condition ?? '',

@@ -1,4 +1,4 @@
-import { error, redirect } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import { createSupabaseServerClient } from '$lib/supabaseServer';
 import type { PageServerLoad } from './$types';
 
@@ -14,7 +14,7 @@ export const load: PageServerLoad = async (event) => {
 		[];
 
 	if (slug) {
-		// mode beli langsung: fetch produk berdasarkan slug
+		// mode beli langsung
 		const { data, error: fetchError } = await supabase
 			.from('products')
 			.select('*')
@@ -38,10 +38,7 @@ export const load: PageServerLoad = async (event) => {
 				qty
 			}
 		];
-
-		// console.log("tes items:" ,items)
 		fromCart = false;
-
 		// mode dari cart
 	} else {
   // mode keranjang
@@ -49,7 +46,6 @@ export const load: PageServerLoad = async (event) => {
   let parsed: any[] = [];
 
   if (user) {
-    // cari id cart terlebih dahulu
     const { data: cartRow, error: cartRowErr } = await supabase
       .from('carts')
       .select('id')
@@ -96,7 +92,6 @@ export const load: PageServerLoad = async (event) => {
     }
   }
 
-  // selanjutnya loop parsed seperti sebelumnya …
   for (const it of parsed) {
     if (!it.product_id || !it.qty) continue;
 

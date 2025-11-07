@@ -11,8 +11,7 @@
   };
 
   // ambil data hasil load()
-  let { data } = $props();         // data: { items, total, fromCart }
-  console.log('data dari server →', data);
+  let { data } = $props();        
 
   let items = $state<ItemType[]>(data.items ?? []);
   let total = $state<number>(data.total ?? 0);
