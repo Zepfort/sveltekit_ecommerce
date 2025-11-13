@@ -16,7 +16,7 @@
 </script>
 <section class="min-h-screen w-full flex flex-col items-center justify-center bg-gray-100">
   <div class="max-w-md w-full bg-[#FAFAFA] rounded-lg shadow-lg p-8 ">
-    <h1 class="text-3xl font-bold text-[#0443F2] mb-4 text-center">🎉 Pembelian Berhasil</h1>
+    <h1 class="text-3xl font-bold text-[#0443F2] mb-4 text-center"> Pembelian Berhasil</h1>
     <p>Nomor Order: <strong>{orderId}</strong></p>
     <p>Waktu Pembayaran: <strong>{paidAt}</strong></p>
   

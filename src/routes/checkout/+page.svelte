@@ -26,25 +26,9 @@
 	let slug = page.url.searchParams.get('slug');
 	let qty = page.url.searchParams.get('qty');
 
-	// async function redirectToPayment() {
-	// 	const response = await fetch('/checkout', {
-	// 		method: 'POST',
-	// 		headers: {
-	// 			'Content-Type': 'application/json'
-	// 		},
-	// 		body: JSON.stringify({ items, total: grandTotal })
-	// 	});
-	// 	const result = await response.json();
-
-	// 	if (response.ok && result.redirect_url) {
-	// 		window.location.href = result.redirect_url;
-	// 	} else {
-	// 		goto('/checkout/failed');
-	// 	}
-	// }
 </script>
 
-<div class="container mx-auto px-4 py-8">
+<div class="container mx-auto px-4 ">
 	<h1 class="mb-4 text-2xl font-bold">Checkout</h1>
 
 	{#if items.length > 0}

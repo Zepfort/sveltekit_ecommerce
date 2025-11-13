@@ -4,7 +4,6 @@ import { createSupabaseServerClient } from '$lib/supabaseServer';
 import type { PageServerLoad, Actions } from './$types';
 import { MIDTRANS_SERVER_KEY } from '$env/static/private';
 
-/* ---------- LOAD ---------- */
 export const load: PageServerLoad = async (event) => {
 	const supabase = createSupabaseServerClient(event);
 	const url = event.url;
@@ -17,7 +16,7 @@ export const load: PageServerLoad = async (event) => {
 		[];
 
 	if (slug) {
-		/* mode beli langsung */
+		// mode beli langsung 
 		const { data, error: fetchError } = await supabase
 			.from('products')
 			.select('*')
@@ -37,7 +36,7 @@ export const load: PageServerLoad = async (event) => {
 		];
 		fromCart = false;
 	} else {
-		/* mode keranjang */
+		// mode keranjang
 		const user = event.locals.session?.user;
 		let parsed: any[] = [];
 
@@ -95,7 +94,7 @@ export const actions: Actions = {
 		);
 		const total = parseFloat(formData.get('total') as string);
 
-		/* 1. buat order record */
+		// order record 
 		const orderId = crypto.randomUUID(); // PK (uuid)
 		const orderNumber = `order-${Date.now()}`; // nomor untuk Midtrans (text)
 
@@ -114,11 +113,11 @@ export const actions: Actions = {
 			.single();
 
 		if (orderErr || !order) {
-			console.error('❌ Supabase order insert error:', orderErr);
+			console.error(' Supabase order insert error:', orderErr);
 			throw error(500, 'Gagal membuat order');
 		}
 
-		/* 2. insert order_items */
+		// insert order_items 
 		for (const item of items) {
 			await supabase.from('order_items').insert({
 				order_id: orderId,
@@ -128,19 +127,19 @@ export const actions: Actions = {
 			});
 		}
 
-		/* 3. siapkan parameter Midtrans (B) */
+		//  parameter Midtrans  
 		const itemDetails = items.map((it) => ({
 			id: it.id,
 			price: it.price,
 			quantity: it.qty,
-			name: it.name.slice(0, 50) // potong nama terlalu panjang
+			name: it.name.slice(0, 50) // potong nama 
 		}));
 		const grossAmount = itemDetails.reduce((s, it) => s + it.price * it.quantity, 0);
 
 		const midtransUrl = 'https://app.sandbox.midtrans.com/snap/v1/transactions'; // <= tanpa spasi
 		const serverKey = MIDTRANS_SERVER_KEY;
 		if (!serverKey) {
-			console.error('❌ MIDTRANS_SERVER_KEY tidak ditemukan di .env');
+			console.error('MIDTRANS_SERVER_KEY tidak ditemukan di .env');
 			throw error(500, 'Konfigurasi Midtrans tidak lengkap');
 		}
 
@@ -177,7 +176,7 @@ export const actions: Actions = {
 			throw error(500, 'Response Midtrans tidak valid');
 		}
 
-		/* 4. cegah redirect kalau gagal (A) */
+		// cegah redirect kalau gagal (A) 
 		if (!response.ok || !midtransData?.redirect_url) {
 			console.error('Midtrans error:', midtransData);
 			throw error(
@@ -186,7 +185,7 @@ export const actions: Actions = {
 			);
 		}
 
-		/* 5. simpan payment_id & redirect */
+		// simpan payment_id & redirect 
 		await supabase
 			.from('orders')
 			.update({ payment_id: midtransData.transaction_id })

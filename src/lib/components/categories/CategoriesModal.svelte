@@ -41,7 +41,7 @@
   <div 
     role="button"
     tabindex="0"
-    class="flex w-[60%] min-w-[40rem] overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-gray-200"
+    class="flex w-[60%] min-w-[40rem] overflow-hidden rounded-sm bg-white shadow-2xl ring-1 ring-gray-200"
     onmouseleave={() => dispatch('close')}>
     <!-- Kategori utama -->
     <div class="w-1/3 border-r max-h-[400px] overflow-y-auto bg-gray-50 p-2">

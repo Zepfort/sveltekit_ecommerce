@@ -14,7 +14,7 @@
 	<div class="flex w-full pt-16 pl-16">
 		<h1 class="text-2xl font-bold text-gray-950">Produk Terbaru</h1>
 	</div>
-	<div class="product-list grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+	<div class="product-list mx-4 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
 		{#each products as p}
 			<ProductCard
 				product={{

@@ -86,7 +86,7 @@
 	userProfile={data.userProfile}
   />
   </header>
-  <main class="flex flex-grow pt-8 pb-16">
+  <main class="flex flex-grow pt-8 pb-12">
    {@render children?.()}  
   </main>
   <footer class="">

@@ -1,67 +1,50 @@
 <script lang="ts">
-    import Icon from "@iconify/svelte";
-    import type {ProductListItem } from "$lib/types/product"
-
-    export let product: ProductListItem;
-
+  import Icon from "@iconify/svelte";
+  import type { ProductListItem } from "$lib/types/product";
+  export let product: ProductListItem;
 </script>
 
-<a href={`/product/${product.slug}`} class="product-card my-2 w-[12rem] h-[18rem]">
-    <div class="card-image-container">
-        <img src={product.image_url} alt={product.name} class="card-image"/>
+<a
+  href={`/product/${product.slug}`}
+  class="product-card my-2 flex w-full max-w-xs flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
+>
+  <!-- GAMBAR -->
+  <div class="relative w-full shrink-0">
+    <img
+      src={product.image_url}
+      alt={product.name}
+      class="h-32 w-full object-contain object-center md:h-40"
+    />
+  </div>
+
+  <!-- KONTEN -->
+  <div class="flex flex-1 flex-col justify-between p-3">
+    <h3 class="line-clamp-2 text-sm font-light text-gray-800 md:text-base">
+      {product.name}
+    </h3>
+
+    <div class="mt-2">
+      <p class="text-lg font-bold text-gray-900 md:text-xl">
+        Rp{product.price.toLocaleString('id-ID')}
+      </p>
+
+      <!-- Rating & terjual -->
+      <div class="mt-1 flex items-center gap-1 text-xs text-gray-600 md:text-sm">
+        <Icon icon="meteocons:star-fill" class="text-yellow-400" width="16" height="16" />
+        <span>{product.rating ?? 0}</span>
+        <Icon icon="mdi:dot" width="12" height="12" />
+        <span>{product.sold ?? 0} terjual</span>
+      </div>
     </div>
-    <div class="p-2">
-        <h3 class="font-light text-base m-0 truncate">{product.name}</h3>
-        <p class="card-price">Rp{product.price.toLocaleString('id-ID')}</p>
-        <div class="flex py-0.5 pl-0 items-center"> 
-            <Icon icon="meteocons:star-fill" width="28" height="28" />
-            <p class="text-base">{product.rating ?? 0}</p>
-            <Icon icon="mdi:dot" width="16" height="16" />
-            <p class="text-base">{product.sold ?? 0} terjual</p>
-        </div>
-    </div>
+  </div>
 </a>
 
 <style>
-    .product-card {
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        overflow: hidden;
-        transition: box-shadow 0.2 ease;
-        text-decoration: none;
-        color: inherit;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .product-card:hover {
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .card-price {
-        font-size: 1.125rem;
-        color: #555;
-        font-weight: 700;
-    }
-
-    .card-image-container {
-        width: 100%;
-        min-height: 180px;
-        max-height: 180px;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .card-image {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        object-position: center;
-        display: block;
-    }
-
-    .card-image-container img {
-        margin: 0;
-        padding: 0;
-    }
+  /* jika belum ada utility line-clamp */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 </style>

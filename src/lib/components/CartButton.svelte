@@ -86,15 +86,27 @@ function handleCheckout() {
     }
   });
 }
-
-
 </script>
 
 <div class="relative">
-  <button type="button" onclick={() => (open = !open)} class="flex items-center gap-2 rounded-sm bg-indigo-600 px-3 py-2 text-white hover:bg-indigo-700">
-    <Icon icon="icon-park-outline:shopping" width="24" height="24" />
-    <span class="text-sm font-semibold">{items.length}</span>
-  </button>
+  <button
+  type="button"
+  onclick={() => (open = !open)}
+  class="relative flex items-center rounded-sm bg-[#0443F2] p-2 text-white hover:bg-[#0433C2] md:gap-2 md:px-3"
+>
+  <Icon icon="icon-park-outline:shopping" width="24" height="24" />
+
+  {#if items.length}
+    <span
+      class="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white"
+    >
+      {items.length > 99 ? '99+' : items.length}
+    </span>
+  {/if}
+  <span class="hidden text-sm font-semibold md:inline">
+    Keranjang
+  </span>
+</button>
 
   {#if open}
     <button class="fixed inset-0 z-40 bg-black/30 sm:bg-transparent"
@@ -103,8 +115,7 @@ function handleCheckout() {
       onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open = false; }}}
       aria-label="Tutup keranjang"
     >
-    </button>
-    
+    </button> 
     <!-- modal panel -->
     <div 
       class="fixed sm:absolute sm:-right-40 bottom-0 sm:bottom-auto
