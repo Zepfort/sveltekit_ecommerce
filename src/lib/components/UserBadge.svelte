@@ -39,7 +39,7 @@
 {:else}
   <div class="flex gap-2">
     <Button href="/login" isLogin={true}>Log In</Button>
-    <Button href="/register">Sign Up</Button>
+    <Button href="/register" isSignUp={true}>Sign Up</Button>
   </div>
 {/if}
 

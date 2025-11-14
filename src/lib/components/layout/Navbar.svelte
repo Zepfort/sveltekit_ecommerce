@@ -2,7 +2,6 @@
 	import Button from '../Button.svelte';
 	import UserBadge from '../UserBadge.svelte';
 	import Icon from '@iconify/svelte';
-	import '/src/lib/style/button.css';
 	import CartButton from '../../components/CartButton.svelte';
 	import { writable } from 'svelte/store';
 	import CategoriesModal from '$lib/components/categories/CategoriesModal.svelte';
