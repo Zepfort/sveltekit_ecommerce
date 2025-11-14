@@ -157,7 +157,7 @@ export const actions: Actions = {
 				customer_details: { email: user.email },
 				item_details: itemDetails,
 				callbacks: {
-					finish: 'https://renzmart.vercel.app/checkout/success',
+					finish: 'https://renzmart.vercel.app/checkout/success?orderId=${orderNumber}',
 					unfinish: 'https://renzmart.vercel.app/checkout/failed',
 					error: 'https://renzmart.vercel.app/checkout/error'
 				}
