@@ -5,7 +5,7 @@ export const load = async (event) => {
   const { slug } = event.params;
   const supabase = createSupabaseServerClient(event);
 
-  // Ambil kategori utama berdasarkan slug
+  // Kategori utama berdasarkan slug
   const { data: category, error: catError } = await supabase
     .from('categories')
     .select('*')
@@ -13,11 +13,10 @@ export const load = async (event) => {
     .single();
 
   if (catError || !category) {
-    console.error('Category fetch error:', catError);
     throw error(404, `Kategori dengan slug "${slug}" tidak ditemukan.`);
   }
 
-  // Ambil semua subkategori dari kategori ini
+  // Semua subkategori dari kategori ini
   const { data: subcategories, error: subcatError } = await supabase
     .from('categories')
     .select('id')
@@ -29,7 +28,7 @@ export const load = async (event) => {
 
   const categoryIds = [category.id, ...(subcategories?.map((sc) => sc.id) ?? [])];
 
-  // Ambil semua produk dari kategori utama dan subkategori-nya
+  // Semua produk dari kategori utama dan subkategori-nya
   const { data: products, error: prodError } = await supabase
     .from('products')
     .select('*')

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Button from '../Button.svelte';
 	import UserBadge from '../UserBadge.svelte';
 	import Icon from '@iconify/svelte';
 	import CartButton from '../../components/CartButton.svelte';
@@ -44,13 +43,13 @@
 <header class="sticky top-0 z-40 bg-gray-950">
   <div class="mx-auto flex w-full items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-8">
 
-    <!-- ===== KIRI ===== -->
+    <!-- KIRI -->
       <!-- Logo -->
       <a href="/" class="sm:hidden md:block shrink-0 text-xl font-bold text-gray-200 lg:pl-40">
         RenzMart
       </a>
 
-    <!-- Tombol Kategori : hanya muncul di lg+ -->
+    <!-- Kategori : hanya muncul di lg+ -->
     <div class="flex justify-around gap-6">
       <button
         class="hidden lg:flex shrink-0 items-center gap-2 rounded-sm bg-[#0443F2] px-3 py-1.5 text-gray-200 hover:bg-[#0433C2]"
@@ -62,7 +61,7 @@
         <span class="text-sm font-semibold">Kategori</span>
       </button>
   
-      <!-- ===== TENGAH : Search ===== -->
+      <!-- TENGAH : Search  -->
       <form onsubmit={handleSearch} class="flex w-full sm:min-w-2xl sm:max-w-2xl items-center sm:flex sm:items-stretch">
         <input
           bind:value={searchQuery}
@@ -76,10 +75,10 @@
       </form>
     </div>
 
-    <!-- ===== KANAN : aksi ===== -->
+    <!-- KANAN : aksi -->
     <div class="flex shrink-0 items-center gap-2 sm:gap-6 lg:pr-40">
 
-      <!-- Cart : ikon saja (mobile & desktop)  -->
+      <!-- Cart  -->
       <CartButton />
 
       <button
@@ -99,7 +98,7 @@
 </header>
 
 
-<!-- ========== MOBILE DRAWER ========== -->
+<!-- MOBILE DRAWER  -->
 {#if $showDrawer}
   <div class="fixed inset-0 z-50 md:hidden">
     <button
@@ -136,7 +135,7 @@
   </div>
 {/if}
 
-<!-- ========== DESKTOP MEGA-MENU ========== -->
+<!-- DESKTOP MEGA-MENU -->
 <div
   class="relative hidden md:block"
   role="region"

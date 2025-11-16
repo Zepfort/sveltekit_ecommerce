@@ -12,7 +12,7 @@
 		image_url?: string;
 	};
 
-	// ambil data hasil load()
+	// ambil data load()
 	let { data } = $props();
 
 	let items = $state<ItemType[]>(data.items ?? []);
@@ -23,12 +23,14 @@
 		fromCart ? items.reduce((sum, it) => sum + it.price * it.qty, 0) : total
 	);
 
+	let addresses = $state(data.addresses ?? []);
+	let selectedAddressId = $state<string>(addresses.find((a) => a.is_default)?.id ?? '');
+
 	let slug = page.url.searchParams.get('slug');
 	let qty = page.url.searchParams.get('qty');
-
 </script>
 
-<div class="container mx-auto px-4 ">
+<div class="container mx-auto px-4">
 	<h1 class="mb-4 text-2xl font-bold">Checkout</h1>
 
 	{#if items.length > 0}
@@ -40,10 +42,33 @@
 					<div class="flex flex-col items-start rounded-lg border p-4 shadow-md">
 						<h2 class="pl-1 text-xl font-semibold text-gray-500">Alamat Pengiriman</h2>
 						<div class="flex gap-1 pt-2">
-							<Icon icon="mdi:location" width="20" height="24" style="color: #0443F2;" />
-							<p class="font-normal">
-								Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus, accusamus?
-							</p>
+							<Icon icon="mdi:location" width="28" height="24" style="color: #DC2626;" />
+							<div class="flex flex-col items-start rounded-sm border p-4 shadow-md">
+								<h2 class="pl-1 text-xl font-semibold text-gray-500">Alamat Pengiriman</h2>
+								{#if addresses.length}
+									<div class="mt-2 flex flex-col gap-2">
+										{#each addresses as addr (addr.id)}
+											<label class="flex items-start gap-2">
+												<input
+													type="radio"
+													name="address_id"
+													value={addr.id}
+													bind:group={selectedAddressId}
+													class="mt-1"
+												/>
+												<div class="text-sm">
+													<p class="font-medium">{addr.recipient} – {addr.label}</p>
+													<p>{addr.full_address}, {addr.village}, {addr.district}</p>
+													<p>{addr.city}, {addr.province} {addr.postal_code}</p>
+													<p class="text-gray-600">Telp. {addr.phone}</p>
+												</div>
+											</label>
+										{/each}
+									</div>
+								{:else}
+									<p class="text-sm text-gray-600">Belum ada alamat tersimpan</p>
+								{/if}
+							</div>
 						</div>
 					</div>
 
@@ -80,12 +105,14 @@
 							<span>Rp {grandTotal.toLocaleString('id-ID')}</span>
 						</div>
 					</div>
-          			<form method="POST">
-							<input type="hidden" name="items" value={JSON.stringify(items)} />
-							<input type="hidden" name="total" value={grandTotal} />
-							<button 
-                  			class="mt-6 w-full font-semibold rounded-sm bg-[#0443F2] py-3 text-gray-200 hover:bg-[#0433C2] cursor-pointer"
-                  			type="submit">Bayar Sekarang</button>
+					<form method="POST">
+						<input type="hidden" name="items" value={JSON.stringify(items)} />
+						<input type="hidden" name="total" value={grandTotal} />
+						<input type="hidden" name="address_id" value={selectedAddressId} />
+						<button
+							class="mt-6 w-full cursor-pointer rounded-sm bg-[#0443F2] py-3 font-semibold text-gray-200 hover:bg-[#0433C2]"
+							type="submit">Bayar Sekarang</button
+						>
 					</form>
 				</div>
 			</div>
@@ -98,14 +125,35 @@
 						<div class="flex flex-col items-start rounded-sm border p-4 shadow-md">
 							<h2 class="pl-1 text-xl font-semibold text-gray-500">Alamat Pengiriman</h2>
 							<div class="flex gap-1 pt-2">
-								<Icon icon="mdi:location" width="20" height="24" style="color: #0443F2;" />
-								<p class="font-normal">
-									Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus, accusamus?
-								</p>
+								<Icon icon="mdi:location" width="28" height="24" style="color: #DC2626;" />
+								{#if addresses.length}
+									<div class="flex flex-col gap-2">
+										{#each addresses as addr (addr.id)}
+											<label for="" class="flex items-start gap-2">
+												<input
+													type="radio"
+													name="address_id"
+													value={addr.id}
+													bind:group={selectedAddressId}
+													class="mt-1"
+												/>
+												<div class="text-sm">
+													<p class="font-medium">{addr.recipient} – {addr.label}</p>
+													<p>{addr.full_address}, {addr.village}, {addr.district}</p>
+													<p>{addr.city}, {addr.province} {addr.postal_code}</p>
+													<p class="text-gray-600">Telp. {addr.phone}</p>
+												</div>
+											</label>
+										{/each}
+									</div>
+								{:else}
+									<p class="text-sm text-gray-600">Belum ada alamat tersimpan</p>
+								{/if}
+								<input type="hidden" name="address_id" value={selectedAddressId} />
 							</div>
 						</div>
 
-						<div class="flex flex-col items-center rounded-sm border p-4 shadow-md text-gray-900">
+						<div class="flex flex-col items-center rounded-sm border p-4 text-gray-900 shadow-md">
 							<img
 								src={it.image_url}
 								alt={it.name}
@@ -139,11 +187,12 @@
 						<form method="POST">
 							<input type="hidden" name="items" value={JSON.stringify(items)} />
 							<input type="hidden" name="total" value={grandTotal} />
-							<button 
-                  			class="mt-6 w-full font-semibold rounded-sm bg-[#0443F2] py-3 text-gray-200 hover:bg-[#0433C2] cursor-pointer"
-                  			type="submit">Bayar Sekarang</button>
+							<input type="hidden" name="address_id" value={selectedAddressId} />
+							<button
+								class="mt-6 w-full cursor-pointer rounded-sm bg-[#0443F2] py-3 font-semibold text-gray-200 hover:bg-[#0433C2]"
+								type="submit">Bayar Sekarang</button
+							>
 						</form>
-						
 					</div>
 				</div>
 			{/each}

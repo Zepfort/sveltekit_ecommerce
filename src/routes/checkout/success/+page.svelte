@@ -1,9 +1,11 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import type { PageData } from './$types';
+  import type { PageData} from './$types';
+  import Icon from '@iconify/svelte';
+  import type { Address } from '$lib/types/address';
 
   let { data }: { data: PageData } = $props();
-  const { orderId, items, total, paidAt, paymentType } = $derived(data);
+  const { orderId, items, total, paidAt, paymentType, address } = $derived(data);
 
   const waNumber = '6285641133135'; 
   const waText = $derived(`Halo RenzMart, saya butuh bantuan untuk order ${orderId} :)`);
@@ -60,6 +62,20 @@
         {/each}
       </ul>
     </section>
+
+    <div class="mb-6">
+      <div class="flex text-center gap-0.5">
+        <Icon icon="mdi:location" width="24" height="24" class="inline text-[#DC2626]" />
+        <h2 class="mb-3 text-sm font-semibold text-slate-700">Alamat</h2>
+      </div>
+      {#if address}
+        <p class=" font-medium text-slate-800 text-xs md:text-sm">{address.recipient} - {address.phone}</p>
+        <p class=" font-medium text-slate-800 text-xs md:text-sm">{address.full_address}, {address.village}, {address.district}</p>
+        <p class=" font-medium text-slate-800 text-xs md:text-sm">{address.city}, {address.province} {address.postal_code}</p>
+      {:else}
+        <p class="text-sm text-gray-600">Alamat tidak tersedia</p>
+      {/if}
+    </div>
 
     <!-- Total -->
     <div class="mb-6 flex items-center justify-between rounded-sm bg-slate-100 px-4 py-3">

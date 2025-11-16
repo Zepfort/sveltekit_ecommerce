@@ -11,6 +11,15 @@ export const load: PageServerLoad = async (event) => {
 	const qtyParam = url.searchParams.get('qty');
 	const qty = qtyParam ? parseInt(qtyParam) : 1;
 	let fromCart = false;
+	const user = event.locals.session?.user;
+
+	if (!user) throw redirect(303, '/login');
+
+	const { data: addresses } = await supabase
+		.from('addresses')
+		.select('*')
+		.eq('user_id', user.id)
+		.order('is_default', { ascending: false });
 
 	let items: Array<{ id: string; name: string; image_url: string; price: number; qty: number }> =
 		[];
@@ -78,10 +87,10 @@ export const load: PageServerLoad = async (event) => {
 	}
 
 	const total = items.reduce((sum, it) => sum + it.price * it.qty, 0);
-	return { items, total, fromCart };
+	return { items, total, fromCart, addresses };
 };
 
-/* ---------- ACTIONS ---------- */
+//  ACTIONS 
 export const actions: Actions = {
 	default: async (event) => {
 		const supabase = createSupabaseServerClient(event);
@@ -93,6 +102,7 @@ export const actions: Actions = {
 			formData.get('items') as string
 		);
 		const total = parseFloat(formData.get('total') as string);
+		const addressId = formData.get('address_id') as string;
 
 		// order record 
 		const orderId = crypto.randomUUID(); // PK (uuid)
@@ -107,7 +117,8 @@ export const actions: Actions = {
 				total_amount: total,
 				status: 'pending',
 				currency: 'IDR',
-				payment_type: 'midtrans'
+				payment_type: 'midtrans',
+				address_id: addressId
 			})
 			.eq('order_id', orderId)
 			.select()
@@ -168,8 +179,6 @@ export const actions: Actions = {
 		});
 
 		const raw = await response.text();
-		console.log('Midtrans response status:', response.status);
-		console.log('Midtrans response body:', raw);
 
 		let midtransData;
 		try {
@@ -179,7 +188,7 @@ export const actions: Actions = {
 			throw error(500, 'Response Midtrans tidak valid');
 		}
 
-		// cegah redirect kalau gagal (A) 
+		// cegah redirect kalau gagal  
 		if (!response.ok || !midtransData?.redirect_url) {
 			console.error('Midtrans error:', midtransData);
 			throw error(
@@ -193,9 +202,6 @@ export const actions: Actions = {
 			.from('orders')
 			.update({ payment_id: midtransData.transaction_id })
 			.eq('id', orderId);
-
-		console.log('orderId dari URL:', orderId);
-		console.log('order dari DB:', order);
 
 		throw redirect(303, midtransData.redirect_url);
 	}
