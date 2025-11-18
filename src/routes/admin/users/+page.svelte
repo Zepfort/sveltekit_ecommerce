@@ -9,7 +9,7 @@
   {#if users.length > 0}
     <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
       <table class="min-w-full border-collapse">
-        <thead class="bg-gray-100 text-left text-sm font-medium text-gray-600">
+        <thead class="bg-gray-200 text-left text-sm font-medium text-gray-900">
           <tr>
             <th class="px-4 py-2">No</th>
             <th class="px-4 py-2">Nama</th>
@@ -17,10 +17,10 @@
             <th class="px-4 py-2">Tanggal Daftar</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-200">
+        <tbody class="py-2 divide-y">
           {#each users as user, i}
-            <tr class="hover:bg-gray-50 transition border-b-gray-900">
-              <td class="px-4 py-2 text-sm text-gray-700">{i + 1}</td>
+            <tr class="hover:bg-gray-200 transition border-b-gray-400 ">
+              <td class="px-4 py-2 text-sm text-gray-900">{i + 1}</td>
               <td class="px-4 py-2 text-sm font-medium text-gray-900">{user.name}</td>
               <td class="px-4 py-2 text-sm text-gray-700">{user.email}</td>
               <td class="px-4 py-2 text-sm text-gray-500">

@@ -1,437 +1,289 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
 	import { enhance } from '$app/forms';
-	import { onMount } from 'svelte';
-	import { supabase } from '$lib/supabaseClient';
-	import '$lib/style/utils.css';
-	import { SupabaseAuthClient } from '@supabase/supabase-js/dist/module/lib/SupabaseAuthClient';
+	import type { SubmitFunction } from '@sveltejs/kit';
 
-	type Category = {
-		id: string; // uuid
-		name: string;
-		slug?: string | null;
-		description?: string | null;
-		parent_id?: string | null;
-		parent?: string | null; 
-		is_active?: boolean;
-		order_index?: number;
-		created_at?: string;
-		updated_at?: string;
-	};
+	// ambil data & form dari props
+	let { data, form } = $props<import('./$types').PageProps>();
 
-	let categories = $state<Category[]>([]);
+	// state UI
+	let categories = $state(data.categories ?? []);
 	let showModal = $state(false);
 	let isEditMode = $state(false);
 	let editId = $state<string | null>(null);
 
-	// modal Konfirmasi Delete
-	let showDeleteModal = $state(false);
-	let selectedDeleteId = $state<string | null>(null);
-	let selectedDeleteName = $state<string | null>(null);
-	
-	// feedback Modal
-	let showFeedbackModal = $state(false);
-	let feedbackMessage = $state<string | null>(null);
-
-	// form fields state		
-	let newDescription = $state('');
-	let newSlug = $state('');
 	let newName = $state('');
+	let newSlug = $state('');
+	let newDescription = $state('');
 	let newParentId = $state<string | null>(null);
 	let newIsActive = $state(true);
-	let formError = $state<string | null>(null);
-	let saving = $state(false);
 
-	function slugify(s: string) {
-		return s
-		.trim()
-		.toLowerCase()
-		.replace(/[^a-z0-9\s-]/g, '')
-		.replace(/\s+/g, '-')
-		.replace(/-+/g, '-')
-	}
+	let showDeleteModal = $state(false);
+	let selectedDeleteId = $state<string | null>(null);
+	let selectedDeleteName = $state('');
 
-	// load categories (READ)
-	async function loadCategories() {
-		const { data, error } = await supabase
-		.from('categories')
-		.select('id, name, parent_id, is_active, slug')
-		.order('name')
-		if (error) {
-			console.log('fethc catergories error:',  error)
-			return;
-		}
-		if (!data) {
-			categories = []
-			return;
-		}
+	let showFeedback = $state(false);
+	let feedbackMessage = $state('');
 
-		// build map id -> name untuk resolve parent name
-		const map = Object.fromEntries(data.map((d: any) => [d.id, d]));
+	type Category = {
+		id: string;
+		name: string;
+		slug?: string | null;
+		description?: string | null;
+		parent_id?: string | null;
+		is_active?: boolean;
+	};
 
-		categories = data.map((d: any) => ({
-			id: d.id,
-			name: d.name,
-			slug: d.slug ?? null,
-			description: d.description ?? null,
-			parent_id: d.parent_id ?? null,
-			parent: d.parent_id ? (map[d.parent_id]?.name ?? d.parent_id) : null,
-			is_active: d.is_active ?? false
-		}));
-	}
-
-	onMount(loadCategories);
-	
-	// Tambah Kategori (CREATE)
-	function handleAddCategory() {
+	// buka modal tambah
+	function handleAdd() {
 		showModal = true;
-		newSlug = '';
-		formError = '';
+		isEditMode = false;
+		editId = null;
 		newName = '';
+		newSlug = '';
 		newDescription = '';
-		newIsActive = true;
 		newParentId = null;
+		newIsActive = true;
 	}
 
-	// Edit Kategori (UPDATE) SSR
-	function handleEdit(id: string) {
-		const c = categories.find((x) => x.id === id);
-		if (!c) return;
-		isEditMode = true;
-		editId = id;
-		newName = c.name,
-		newSlug = c.slug ?? '',
-		newDescription = c.description ?? '',
-		newParentId = c.parent_id ?? null;
-		newIsActive = !!c.is_active;
+	// buka modal edit
+	function handleEdit(cat: Category) {
 		showModal = true;
+		isEditMode = true;
+		editId = cat.id;
+		newName = cat.name;
+		newSlug = cat.slug ?? '';
+		newDescription = cat.description ?? '';
+		newParentId = cat.parent_id ?? null;
+		newIsActive = !!cat.is_active;
 	}
 
-	// Buka modal konfirmasi hapus
-	function confirmDelete(id: string, name: string) {
-		selectedDeleteId = id;
-		selectedDeleteName = name;
+	// buka confirm delete
+	function confirmDelete(cat: Category) {
 		showDeleteModal = true;
+		selectedDeleteId = cat.id;
+		selectedDeleteName = cat.name;
 	}
 
-	// Hapus Kategori (DELETE) SSR
+	// action selesai untuk form create / update
+	const handleSave: SubmitFunction = async ({ formData, action, result, update }) => {
+		await update();
+		if (result.type === 'success') {
+			feedbackMessage = result.data?.message ?? 'Saved';
+			showFeedback = true;
+			showModal = false;
+			location.reload(); // atau invalidateAll()
+		} else {
+			feedbackMessage = result.data?.message ?? 'Failed to save';
+			showFeedback = true;
+		}
+	};
+
+	// delete konfirmasi
 	async function handleDeleteConfirmed() {
-		if (!selectedDeleteId) return;
-		const res = await fetch(`/admin/categories/${selectedDeleteId}`, {
-			method: 'DELETE'
-		});
+		const formData = new FormData();
+		formData.set('id', selectedDeleteId!);
+
+		const res = await fetch('?/delete', { method: 'POST', body: formData });
 		const result = await res.json();
 
-		if(!res.ok) {
-			alert('Gagal menghapus: ' + result.message);
-			return;
-		}
-		await loadCategories();
-		showDeleteModal = false
+		showDeleteModal = false;
 
-		feedbackMessage =  `Category "${selectedDeleteName}" succesfully deleted`
-		showFeedbackModal = true;
-		setTimeout(() => {
-			showFeedbackModal = false;
-			feedbackMessage = null;
-		}, 3000);
-	}
+		feedbackMessage = result.message ?? (res.ok ? 'Deleted' : 'Error deleting');
+		showFeedback = true;
 
-	// Simpan Kategori (INSERT)
-	async function saveCategory() {
-		event?.preventDefault();
-		formError = '';
-		if (!newName.trim()) {
-			formError = 'Need New Name categoriy ';
-			return;
-		}
-
-		saving = true;
-
-		// Slug otomatis
-		const slugValue = newSlug?.trim() ? slugify(newSlug) : slugify(newName);
-
-		// cek uniq slug (simple client-side check)
-		const { data: existing } = await supabase
-      		.from('categories')
-      		.select('id')
-     		.eq('slug', slugValue)
-      		.limit(1)
-      		.maybeSingle();
-
-    	if (existing && (!isEditMode || existing.id !== editId)) {
-      	formError = 'Slug has been used, please change';
-      	saving = false;
-      	return;
-    	}
-
-		const payload = {
-      		name: newName.trim(),
-      		slug: slugValue,
-      		description: newDescription ? newDescription.trim() : null,
-      		parent_id: newParentId || null,
-      		is_active: newIsActive,
-      		order_index: 0
-		}
-
-		let res, result;
-
-		if(isEditMode && editId) {
-			//update
-			res = await fetch(`/admin/categories/${editId}`, {
-				method: 'PATCH',
-				headers: { 'Content-Type' : 'application/json' },
-				body: JSON.stringify(payload)
-			});
-
-			result = await res.json();
-			if(!res.ok) {
-				formError = result?.message || 'Failed to update category';
-				saving = false;
-				return;
-			}	
-
-			feedbackMessage = `Category "${newName}" succesfully updated`;
-			showFeedbackModal = true;
-			setTimeout(() => {
-				showFeedbackModal = false;
-				feedbackMessage = null;
-			}, 3000); 
-		} else {
-			const { error } = await supabase.from('categories').insert(payload);
-				if (error) {
-				console.error('insert category error', error);
-				formError = error.message ?? 'Failed to save category';
-				saving = false;
-				return;
-			} 
-			
-			feedbackMessage = `Category "${newName}" succesfully created`
-			showFeedbackModal = true;
-			setTimeout(() => {
-				showFeedbackModal = false;
-				feedbackMessage = null;
-			}, 3000
-			)
-
-		}
-
-		await loadCategories();
-		showModal = false;
-		saving = false
-	
+		// reload data
+		location.reload();
 	}
 </script>
 
-<section class="space-y-6">
-	<h2 class="text-2xl font-bold text-slate-900 pt-16">Product Categories</h2>
+<section class="space-y-6 pt-12">
+	<h2 class="text-2xl font-bold">Kategori Produk</h2>
 
-	<div class="mb-4 flex items-center justify-between">
-		<button
-			onclick={handleAddCategory}
-			class="col-bg-primary flex items-center gap-2 rounded-sm px-4 py-2 text-sm font-semibold shadow transition"
-		>
-			<Icon icon="mdi:plus" width="20" height="20" /> New Category
-		</button>
+	<button
+		class="flex cursor-pointer items-center gap-2 rounded-sm px-8 py-2 text-sm font-semibold bg-[#0443F2] text-gray-200 hover:bg-[#0433C2]"
+		onclick={handleAdd}
+	>
+		<Icon icon="mdi:plus" width="20" height="20" /> Tambah Kategori
+	</button>
 
-	</div>
-
-	<!-- Modal Create/Update  -->
 	{#if showModal}
-		<div class="col-bg-admin-opa fixed inset-0 z-50 flex items-center justify-center">
-			<form onsubmit={saveCategory} class="w-full flex justify-center">
-				<div class="relative mx-4 w-full max-w-md rounded-lg bg-white p-6">
-					<button
-						type= "button"
-						onclick={() => (showModal = false)}
-						class="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-					>
-						&times;
-					</button>
-					<h2 class="col-text-black mb-4 text-xl font-semibold">
-						{isEditMode ? 'Edit Category' : 'New Category'}
-					</h2>
-
+		<div class="fixed inset-0 z-50 flex items-center justify-center">
+			<button
+				type="button"
+				class="absolute inset-0 bg-slate-950/40"
+				onclick={() => (showModal = false)}
+				aria-label="Close modal"
+			>
+			</button>
+			<div class="fixed inset-0 z-50 flex items-center justify-center">
+				<form
+					method="POST"
+					use:enhance={handleSave}
+					action={isEditMode ? '?/update' : '?/create'}
+					class="relative w-96 rounded-lg bg-gray-50 p-6 shadow-lg"
+				>
+					<h3 class="mb-4 text-lg font-semibold">{isEditMode ? 'Edit Kategori' : 'Kategori Baru'}</h3>
+					{#if isEditMode}
+						<input type="hidden" name="id" value={editId} />
+					{/if}
+	
 					<div class="space-y-4">
-						<!-- Name -->
-						<div>
-							<label for="category-name" class="col-text-black mb-1 block">Category name<span class="text-red-700">*</span></label>
+						<div >
+							<label for="name" class="block text-sm font-medium pb-1">Nama<span class="text-red-700">*</span></label>
 							<input
-								name="category-name"
-								type="text"
+								name="name"
 								bind:value={newName}
+								required
 								class="w-full rounded border px-3 py-2"
-								placeholder="Category name"
+								placeholder="Nama produk"
 							/>
 						</div>
-						<!-- Slug -->
+	
 						<div>
-							<label for="slug-name" class="col-text-black mb-1 block">Slug<span class="text-red-700">*</span></label>
-							<input
-								name="slug-name"
-								type="text"
-								bind:value={newSlug}
-								class="w-full rounded border px-3 py-2"
-								placeholder="Slug-category"
-							/>
+							<label for="slug" class="block text-sm font-medium pb-1">Slug<span class="text-red-700">*</span></label>
+							<input 
+								name="slug" 
+								bind:value={newSlug} 
+								class="w-full rounded border px-3 py-2" 
+								required
+								placeholder="slug-kategori"/>
 						</div>
-						<!-- Description -->
+	
 						<div>
-							<label for="description" class="col-text-black mb-1 block">Description</label>
+							<label for="description" class="block text-sm font-medium pb-1">Deskripsi<span class="text-red-700">*</span></label>
 							<textarea
 								name="description"
 								bind:value={newDescription}
 								class="w-full rounded border px-3 py-2"
-								placeholder="Description (optional)"
+								placeholder="Deskripsi kategori"
 							></textarea>
 						</div>
+	
 						<div>
-							<label for="parent-category-name" class="col-text-black mb-1 block"
-								>Parent Category (optional)</label
-							>
+							<label for="parent_id" class="block text-sm font-medium pb-1">Parent Category<span class="text-red-700">*</span></label>
 							<select
-								name="parent-category-name"
+								name="parent_id"
 								bind:value={newParentId}
 								class="w-full rounded border px-3 py-2"
 							>
-								<option value="">-- Choose Parent --</option>
-								{#each categories as pc}
-									<option value={pc.id}>{pc.name}</option>
+								<option value="">-- None --</option>
+								{#each categories as c}
+									<option value={c.id}>{c.name}</option>
 								{/each}
 							</select>
 						</div>
-
-						{#if formError}
-							<div class="text-sm text-red-600">{formError}</div>
-						{/if}
-
-						<div class="mt-4 flex justify-end gap-2">
-							<button
-								onclick={() => (showModal = false)}
-								class="rounded bg-gray-200 px-4 py-2 hover:bg-gray-300">Cancel</button
-							>
-							<button 
-								type="submit"
-								onclick={saveCategory} 
-								class="col-bg-primary rounded px-4 py-2 text-white"
-								disabled = {saving}
-							>
-								{#if saving}
-									Saving...
-								{:else if isEditMode == true}
-									Update
-								{:else}
-									Save
-								{/if}	
-							</button
-							>
+	
+						<div class="flex items-center gap-2">
+							<input type="checkbox" name="is_active" checked={newIsActive} />
+							<label for="" class="text-sm">Active</label>
 						</div>
 					</div>
-				</div>
-			</form>
+	
+					<div class="mt-4 flex justify-end gap-2">
+						<button
+							type="button"
+							onclick={() => (showModal = false)}
+							class="rounded bg-gray-200 px-4 py-2 hover:bg-gray-300"
+						>
+							Batal
+						</button>
+						<button
+							type="submit"
+							onclick={() => (showModal = false)}
+							class="rounded bg-[#0443F2] px-4 py-2 text-gray-200 hover:bg-[#0433C2]"
+						>
+							Simpan
+						</button>
+					</div>
+				</form>
+			</div>
 		</div>
 	{/if}
 
-	<!-- Modal Konfirmasi Hapus -->
-	 {#if showDeleteModal}
-		<div class="col-bg-admin-opa fixed inset-0 z-50 flex items-center justify-center">
-			<div class="bg-white rounded-lg p-6 w-[400px] shadow-lg">
-				<h2 class="text-lg font-semibold mb-2">Hapus Kategori</h2>
-				<p class="text-gray-600 mb-4">
-					Tindakan ini tidak dapat dibatalkan.<br />
-					Yakin ingin menghapus kategori
-					<span class="font-semibold text-red-600">{selectedDeleteName}</span>?
-				</p>
-				<div class="flex justify-end gap-3">
-					<button
-						class="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300"
-						onclick={() => (showDeleteModal = false)}
-					>
-						Batal
-					</button>
-					<button
-						class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-						onclick={() => handleDeleteConfirmed()}
-					>
-						Hapus
-					</button>
-				</div>
-			</div>
+	{#if showDeleteModal}
+		<div class="fixed inset-0 z-50 flex items-center justify-center">
+			<button
+				type="button"
+				class="absolute inset-0 bg-slate-950/40"
+				onclick={() => (showDeleteModal = false)}
+				aria-label="Close modal"
+			>
+			</button>
 		</div>
-	 {/if}
+	{/if}
 
-	 <!-- Modal Feedback -->
-	  {#if showFeedbackModal}
-		<div class="col-bg-admin-opa fixed inset-0 z-50 flex items-center justify-center">
-			<div class="bg-white rounded-lg p-6 w-[380px] shadow-lg text-center">
-				<h2 class="text-lg font-semibold mb-2 text-green-600">Berhasil!</h2>
-				<p class="text-gray-700 mb-4">{feedbackMessage}</p>
-				<button
-					class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-					onclick={() => (showFeedbackModal = false)}
-				>
-					Oke
-				</button>
-			</div>
+	{#if showDeleteModal}
+		<div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40">
+			<div class="w-full max-w-sm rounded-lg bg-white p-6 shadow">	
+					<h3 class="mb-2 text-lg font-semibold">Hapus Kategori</h3>
+					<p class="mb-0.5 text-gray-700">Apa Anda yakin hapus kategori <strong class="text-red-700">{selectedDeleteName}</strong>?</p>
+					<p class="mb-6 text-gray-700">Tindakan ini tidak bisa dibatalkan</p>
+					<div class="flex justify-end gap-2">
+						<button
+							onclick={() => (showDeleteModal = false)}
+							class="rounded bg-gray-200 px-4 py-2 hover:bg-gray-300"
+						>
+							Batal
+						</button>
+						<button
+							onclick={handleDeleteConfirmed}
+							class="rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+						>
+							Hapus
+						</button>
+					</div>
+				</div>		
 		</div>
-	  {/if}
+	{/if}
 
-	<div class="overflow-x-auto rounded-lg bg-white shadow">
-		<table class="w-full border-collapse">
-			<thead class="bg-gray-100 text-sm text-gray-700 uppercase">
+	{#if showFeedback}
+		<div class="fixed right-4 bottom-4 rounded bg-white px-4 py-2 shadow-lg">
+			<p>{feedbackMessage}</p>
+		</div>
+	{/if}
+
+	<div class="mt-4 overflow-x-auto rounded bg-white shadow">
+		<table class="min-w-full divide-y divide-gray-200">
+			<thead class="bg-gray-100">
 				<tr>
-					<th class="px-4 py-3 text-left">Category Name</th>
-					<th class="px-4 py-3 text-left">Parent Category</th>
-					<th class="px-4 py-3 text-center">Move</th>
-					<th class="px-4 py-3 text-center">Active</th>
-					<th class="px-4 py-3 text-center">Actions</th>
+					<th class="px-4 py-2 text-left text-sm font-bold text-gray-900 uppercase">Nama</th>
+					<th class="px-4 py-2 text-left text-sm font-bold text-gray-900 uppercase"
+						>Induk Kategori</th
+					>
+					<th class="px-4 py-2 text-center text-sm font-bold text-gray-900 uppercase">Aktif</th>
+					<th class="px-4 py-2 text-center text-sm font-bold text-gray-900 uppercase">Aksi</th>
 				</tr>
 			</thead>
-			<tbody class="divide-y divide-gray-100">
+			<tbody class="divide divide-y">
 				{#each categories as c (c.id)}
-					<tr class="transition hover:bg-gray-50">
-						<td
-							class="col-text-black cursor-pointer px-4 py-3 text-base font-medium hover:underline"
-							>{c.name}</td
-						>
-						<td class="col-text-primary px-4 py-3 text-base font-medium">{c.parent ?? '-'}</td>
+					<tr class="hover:bg-gray-50 border-b-gray-200">
+						<td class="px-4 py-3">{c.name}</td>
+						<td class="px-4 py-3 text-blue-700">{c.parent ?? '-'}</td>
 						<td class="px-4 py-3 text-center">
-							<div class="flex justify-center gap-2">
-								<button class="rounded bg-blue-500 p-1.5 text-white transition hover:bg-blue-600">
-									<Icon icon="mdi:arrow-up" width="18" height="18" />
-								</button>
-								<button class="rounded bg-blue-500 p-1.5 text-white transition hover:bg-blue-600">
-									<Icon icon="mdi:arrow-down" width="18" height="18" />
-								</button>
-							</div>
-						</td>
-						<td class="px-4 py-3 flex flex-row text-center items-center gap-4">
 							{#if c.is_active}
-								<Icon icon="mdi:check" class="text-green-600" width="24" height="24" /><span class="text-gray-900 text-sm font-semibold">Active</span>
+								<span class="rounded bg-green-100 px-2 py-1 text-xs text-green-700">Active</span>
 							{:else}
-								<Icon icon="mdi:close" class="text-red-500" width="24" height="24" /><span class="text-gray-900 text-sm font-semibold">Not Active</span>
+								<span class="rounded bg-red-100 px-2 py-1 text-xs text-red-700">Inactive</span>
 							{/if}
 						</td>
-						<td class="px-4 py-3 text-center">
-							<div class="flex justify-center gap-2">
-								<button
-									onclick={() => handleEdit(c.id)}
-									class="rounded bg-blue-500 p-2 text-white transition hover:bg-blue-600"
-								>
-									<Icon icon="mdi:pencil" width="18" height="18" />
-								</button>
-								<button
-									onclick={() => confirmDelete(c.id, c.name)}
-									class="rounded bg-rose-500 p-2 text-white transition hover:bg-rose-600"
-								>
-									<Icon icon="mdi:trash-can" width="18" height="18" />
-								</button>
-							</div>
+						<td class="space-x-2 px-4 py-2 text-center">
+							<button
+								onclick={() => handleEdit(c)}
+								class="rounded bg-[#0443F2] px-2 py-2 text-white hover:bg-[#0433C2]"
+							>
+								<Icon icon="mdi:pencil" width="18" height="18" />
+							</button>
+							<button
+								onclick={() => confirmDelete(c)}
+								class="rounded bg-rose-500 px-2 py-2 text-white hover:bg-rose-600"
+							>
+								<Icon icon="mdi:trash-can" width="18" height="18" />
+							</button>
 						</td>
 					</tr>
 				{/each}
 			</tbody>
 		</table>
 	</div>
-
 </section>

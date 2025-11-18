@@ -118,15 +118,15 @@
   <div class="mx-auto px-0 pt-12">
     <h1 class="mb-6 text-2xl font-bold text-blue-900">Daftar Order</h1>
 
-    <div class="rounded-sm bg-white shadow-sm">
-      <div class="hidden md:grid grid-cols-12 gap-4 items-center px-6 py-3 bg-slate-50 border-b">
-        <div class="col-span-3 text-sm font-bold text-slate-600">Order</div>
-        <div class="col-span-2 text-sm font-bold text-slate-600">User</div>
-        <div class="col-span-1 text-sm font-bold text-slate-600">Total</div>
-        <div class="col-span-2 text-sm font-bold text-slate-600">Status</div>
-        <div class="col-span-2 text-sm font-bold text-slate-600">Payment</div>
-        <div class="col-span-1 text-sm font-bold text-slate-600">Waktu</div>
-        <div class="col-span-1 text-sm font-bold text-slate-600 text-right">Aksi</div>
+    <div class="rounded-sm bg-gray-50 shadow-sm">
+      <div class="hidden md:grid grid-cols-12 gap-4 items-center px-6 py-3 bg-gray-200">
+        <div class="col-span-3 text-sm font-bold text-gray-900">ORDER</div>
+        <div class="col-span-2 text-sm font-bold text-gray-900">USER</div>
+        <div class="col-span-1 text-sm font-bold text-gray-900">TOTAL</div>
+        <div class="col-span-2 text-sm font-bold text-gray-900">STATUS</div>
+        <div class="col-span-2 text-sm font-bold text-gray-900">PAYMENT</div>
+        <div class="col-span-1 text-sm font-bold text-gray-900">WAKTU</div>
+        <div class="col-span-1 text-sm font-bold text-gray-900 text-right">AKSI</div>
       </div>
 
       <div class="overflow-x-auto">
@@ -183,16 +183,16 @@
 
                 <div class="col-span-1 flex justify-end gap-2">
                   <a href={`/admin/orders/${order.id}`} class="inline-flex items-center justify-center rounded-md border border-slate-200 bg-[#0443F2] px-3 py-2 text-sm shadow-sm hover:bg-[#0433C2]" aria-label="view">
-                    <Icon icon="mdi:pencil" width="16" height="16" class="text-gray-200"/>
+                    <Icon icon="mdi:pencil" width="18" height="18" class="text-gray-200"/>
                   </a>
 
                   {#if order.status !== 'void'}
                     <button
-                      class="inline-flex items-center justify-center rounded-md bg-rose-500 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-rose-600 focus:outline-none"
+                      class="inline-flex items-center justify-center rounded-sm bg-rose-500 px-3 py-2.5 text-sm font-medium text-gray-200 shadow-sm hover:bg-rose-600 focus:outline-none"
                       onclick={() => openVoidModal(order)}
                       aria-label="void"
                     >
-                      <Icon icon="mdi:trash-can" width="16" height="16" />
+                      <Icon icon="mdi:trash-can" width="18" height="18" />
                     </button>
                   {/if}
                 </div>

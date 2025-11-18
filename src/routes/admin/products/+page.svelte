@@ -41,6 +41,7 @@
 	// state untuk modal hapus
 	let showModalDelete = $state(false);
 	let toDeleteId = $state<String | null>(null);
+	let toDeleteName = $state<string>('');
 
 	// state feedback
 	let showFeedbackModal = $state(false);
@@ -108,8 +109,8 @@
 	}
 </script>
 
-<section class="space-y-6">
-	<h2 class="text-2xl font-bold text-slate-900 pt-16">Products</h2>
+<section class="space-y-6 bg-transparent">
+	<h2 class="text-2xl font-bold text-slate-900 pt-16">Produk</h2>
 
 	<!-- Add Product -->
 	<div class="mb-4 flex px-0 items-center justify-between">
@@ -117,13 +118,13 @@
 			onclick={handleAddProduct}
 			class="col-bg-primary flex items-center gap-2 rounded-sm px-8 py-2 text-sm font-semibold shadow transition"
 		>
-			<Icon icon="mdi:plus" width="20" height="20" /> New Product
+			<Icon icon="mdi:plus" width="20" height="20" /> Tambah Produk
 		</button>
 	</div>
 
 	{#if showModal}
 		<div class="col-bg-admin-opa fixed inset-0 z-50 flex items-center justify-center">
-			<div class="relative mx-4 w-full max-w-lg rounded-lg bg-white p-6 shadow-lg">
+			<div class="relative mx-4 w-full max-w-lg rounded-sm bg-white p-6 shadow-lg">
 				<button
 					onclick={() => (showModal = false)}
 					class="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
@@ -139,13 +140,14 @@
 						handleSubmit(e);
 					}}
 				>
+				<h3 class="mb-4 text-lg font-semibold">{isEditing ? 'Edit Produk' : 'Produk Baru'}</h3>
 					{#if isEditing}
 						<input type="hidden" name="id" value={editId} />
 					{/if}
 					<div class="space-y-4">
 						<div>
 							<label for="product_name" class="mb-1 block text-slate-700"
-								>Product Name<span class="text-red-700">*</span></label
+								>Nama Produk<span class="text-red-700">*</span></label
 							>
 							<input
 								type="text"
@@ -153,26 +155,27 @@
 								name="name"
 								bind:value={newName}
 								class="w-full rounded border px-3 py-2"
-								placeholder="Enter product name"
+								placeholder="Nama produk"
 								required
 							/>
 						</div>
 
 						<div>
-							<label for="description" class="mb-1 block text-slate-700">Description</label>
+							<label for="description" class="mb-1 block text-slate-700">Deskripsi<span class="text-red-700">*</span></label>
 							<textarea
 								id="description"
 								name="description"
 								bind:value={newDescription}
 								class="w-full rounded border px-3 py-2"
-								placeholder="Enter description"
+								placeholder="Deskripsi"
+								required
 							></textarea>
 						</div>
 
 						<div class="grid grid-cols-2 gap-4">
 							<div>
 								<label for="price" class="mb-1 block text-slate-700"
-									>Price<span class="text-red-700">*</span></label
+									>Harga<span class="text-red-700">*</span></label
 								>
 								<CurrencyInput
 									bind:value={newPrice}
@@ -185,7 +188,7 @@
 							</div>
 							<div>
 								<label for="stock" class="mb-1 block text-slate-700"
-									>Stock<span class="text-red-700">*</span></label
+									>Stok<span class="text-red-700">*</span></label
 								>
 								<input
 									type="number"
@@ -201,7 +204,7 @@
 
 						<div>
 							<label for="category" class="mb-1 block text-slate-700"
-								>Category<span class="text-red-700">*</span></label
+								>Kategori<span class="text-red-700">*</span></label
 							>
 							<select
 								id="category"
@@ -210,7 +213,7 @@
 								class="w-full rounded border px-3 py-2"
 								required
 							>
-								<option value="">-- Choose Category --</option>
+								<option value="">-- Pilih --</option>
 								{#each categories as c}
 									<option value={c.id}>{c.name}</option>
 								{/each}
@@ -219,7 +222,7 @@
 
 						<div>
 							<label for="image_url" class="mb-1 block text-slate-700"
-								>Image<span class="text-red-700">*</span></label
+								>Gambar<span class="text-red-700">*</span></label
 							>
 							<input
 								id="image_url"
@@ -244,7 +247,7 @@
 								bind:checked={newIsActive}
 								class="h-4 w-4"
 							/>
-							<label for="active" class="text-slate-700">Active</label>
+							<label for="active" class="text-slate-700">Aktif</label>
 						</div>
 
 						{#if errorMsg}
@@ -257,13 +260,13 @@
 								onclick={() => (showModal = false)}
 								class="rounded bg-gray-200 px-4 py-2 hover:bg-gray-300"
 							>
-								Cancel
+								Batal
 							</button>
 							<button
 								type="submit"
-								class="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+								class="rounded bg-[#0443F2] px-4 py-2 text-white hover:bg-[#0433C2]"
 							>
-								{isEditing ? 'Update' : 'Save'}
+								{isEditing ? 'Update' : 'Simpan'}
 							</button>
 						</div>
 					</div>
@@ -274,10 +277,11 @@
 
 	<!-- Modal Hapus -->
 	{#if showModalDelete}
-		<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+		<div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40">
 			<div class="w-full max-w-sm rounded-lg bg-white p-6 shadow">
-				<h3 class="mb-4 text-lg font-semibold">Hapus Produk</h3>
-				<p class="mb-6 text-sm text-gray-600">Tindakan ini tidak dapat dibatalkan.</p>
+				<h3 class="mb-4 text-lg font-semibold">Hapus Produk </h3>
+				<p class="mb-0.5 text-md text-gray-600">Apakah Anda yakin ingin hapus <strong class="text-red-700">{toDeleteName}</strong>?</p>
+				<p class="mb-6 text-md text-gray-600">Tindakan ini tidak dapat dibatalkan.</p>
 
 				<div class="flex justify-end gap-2">
 					<button
@@ -289,7 +293,7 @@
 					<!-- trigger submit via runes -->
 					<button
 						type="submit"
-						class="rounded bg-rose-500 px-4 py-2 text-white hover:bg-rose-600"
+						class="rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700"
 						onclick={(e) => {
 							e.preventDefault();
 							formNode?.requestSubmit();
@@ -318,24 +322,24 @@
 		</div>
 	{/if}
 
-	<div class="overflow-x-auto rounded-lg bg-white shadow">
+	<div class="overflow-x-auto rounded-lg bg-gray-50 shadow">
 		{#key data.products.length}
 			<table class="min-w-full text-left text-sm">
-				<thead class="bg-gray-100 text-gray-700">
+				<thead class="bg-gray-200 text-gray-700">
 					<tr>
-						<th class="px-4 py-2">Image</th>
-						<th class="px-4 py-2">Name</th>
-						<th class="px-4 py-2">Category</th>
-						<th class="px-4 py-2">Price</th>
-						<th class="px-4 py-2">Stock</th>
-						<th class="px-4 py-2">Status</th>
-						<th class="px-4 py-2">Actions</th>
+						<th class="px-4 py-2">GAMBAR</th>
+						<th class="px-4 py-2">NAMA</th>
+						<th class="px-4 py-2">KATEGORI</th>
+						<th class="px-4 py-2">HARGA</th>
+						<th class="px-4 py-2">STOK</th>
+						<th class="px-4 py-2">STATUS</th>
+						<th class="px-4 py-2">AKSI</th>
 					</tr>
 				</thead>
-				<tbody>
+				<tbody class="divide divide-y">
 					{#if products.length}
 						{#each data.products as p}
-							<tr class="border-b hover:bg-gray-50">
+							<tr class="border-b-gray-400 hover:bg-gray-100">
 								<td class="px-4 py-2">
 									{#if p.image_url}
 										<img src={p.image_url} alt={p.name} class="h-18 w-20 rounded object-cover" />
@@ -360,7 +364,7 @@
 										<button
 											type="button"
 											onclick={() => openEditModal(p)}
-											class="rounded bg-blue-500 p-2 text-white transition hover:bg-blue-600"
+											class="rounded bg-[#0443F2] px-2 py-2 text-white transition hover:bg-[#0433C2]"
 										>
 											<Icon icon="mdi:pencil" width="18" height="18" />
 										</button>
@@ -374,7 +378,7 @@
 													showModalDelete = false; // tutup modal
 													toDeleteId = null; // reset id
 													await update(); // refresh data
-													feedbackMessage = `Product successfully deleted`; // Feedback
+													feedbackMessage = `Produk sukses dihapus`; // Feedback
 													showFeedbackModal = true;
 													setTimeout(() => {
 														showFeedbackModal = false;
@@ -391,8 +395,9 @@
 												onclick={() => {
 													toDeleteId = p.id;
 													showModalDelete = true;
+													toDeleteName = p.name;
 												}}
-												class="rounded bg-rose-500 p-2 text-white hover:bg-rose-600"
+												class="rounded-sm bg-rose-500 p-2 text-gray-200 hover:bg-rose-600"
 											>
 												<Icon icon="mdi:trash-can" width="18" height="18" />
 											</button>
@@ -413,10 +418,10 @@
 </section>
 
 <style>
-	.currencyInput__formatted {
+	/* .currencyInput__formatted {
 		width: 100%;
 		border: 1px solid #ccc;
 		border-radius: 0.375rem;
 		padding: 0.5rem;
-	}
+	} */
 </style>
