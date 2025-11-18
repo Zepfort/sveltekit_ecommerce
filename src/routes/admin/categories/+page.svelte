@@ -1,42 +1,38 @@
+<!-- /admin/categories/+page.svelte -->
 <script lang="ts">
 	import Icon from '@iconify/svelte';
 	import { enhance } from '$app/forms';
+	import type { PageProps } from './$types';
 	import type { SubmitFunction } from '@sveltejs/kit';
 
-	// ambil data & form dari props
-	let { data, form } = $props<import('./$types').PageProps>();
+	let { data, form }: PageProps = $props();
 
-	// state UI
-	let categories = $state(data.categories ?? []);
+	let categories = $derived(data.categories ?? []);
+
+	/* ---------- UI state ---------- */
 	let showModal = $state(false);
 	let isEditMode = $state(false);
 	let editId = $state<string | null>(null);
-
 	let newName = $state('');
 	let newSlug = $state('');
 	let newDescription = $state('');
 	let newParentId = $state<string | null>(null);
 	let newIsActive = $state(true);
-
 	let showDeleteModal = $state(false);
 	let selectedDeleteId = $state<string | null>(null);
 	let selectedDeleteName = $state('');
-
 	let showFeedback = $state(false);
 	let feedbackMessage = $state('');
 
-	type Category = {
-		id: string;
-		name: string;
-		slug?: string | null;
-		description?: string | null;
-		parent_id?: string | null;
-		is_active?: boolean;
-	};
+	/* ---------- helpers ---------- */
+	function showToast(msg: string) {
+		feedbackMessage = msg;
+		showFeedback = true;
+		setTimeout(() => (showFeedback = false), 2500);
+	}
 
-	// buka modal tambah
+	/* ---------- modal ---------- */
 	function handleAdd() {
-		showModal = true;
 		isEditMode = false;
 		editId = null;
 		newName = '';
@@ -44,11 +40,9 @@
 		newDescription = '';
 		newParentId = null;
 		newIsActive = true;
-	}
-
-	// buka modal edit
-	function handleEdit(cat: Category) {
 		showModal = true;
+	}
+	function handleEdit(cat: (typeof categories)[0]) {
 		isEditMode = true;
 		editId = cat.id;
 		newName = cat.name;
@@ -56,57 +50,47 @@
 		newDescription = cat.description ?? '';
 		newParentId = cat.parent_id ?? null;
 		newIsActive = !!cat.is_active;
+		showModal = true;
 	}
-
-	// buka confirm delete
-	function confirmDelete(cat: Category) {
-		showDeleteModal = true;
+	function confirmDelete(cat: (typeof categories)[0]) {
 		selectedDeleteId = cat.id;
 		selectedDeleteName = cat.name;
+		showDeleteModal = true;
 	}
 
-	// action selesai untuk form create / update
-	const handleSave: SubmitFunction = async ({ formData, action, result, update }) => {
-		await update();
-		if (result.type === 'success') {
-			feedbackMessage = result.data?.message ?? 'Saved';
-			showFeedback = true;
-			showModal = false;
-			location.reload(); // atau invalidateAll()
-		} else {
-			feedbackMessage = result.data?.message ?? 'Failed to save';
-			showFeedback = true;
-		}
-	};
+	const handleSave: SubmitFunction =
+		() =>
+		async ({ result, update }) => {
+			await update({ reset: false, invalidateAll: true }); // reload data
+			showToast(
+				(result.type === 'success' || result.type === 'failure'
+					? result.data?.message
+					: undefined) ?? 'Gagal menyimpan'
+			);
+			showModal = false; 
+		};
 
-	// delete konfirmasi
-	async function handleDeleteConfirmed() {
-		const formData = new FormData();
-		formData.set('id', selectedDeleteId!);
-
-		const res = await fetch('?/delete', { method: 'POST', body: formData });
-		const result = await res.json();
-
-		showDeleteModal = false;
-
-		feedbackMessage = result.message ?? (res.ok ? 'Deleted' : 'Error deleting');
-		showFeedback = true;
-
-		// reload data
-		location.reload();
-	}
+	const handleDelete: SubmitFunction =
+		() =>
+		async ({ result, update }) => {
+			await update({ reset: false, invalidateAll: true });
+			showDeleteModal = false;
+			selectedDeleteId = null;
+			showToast(result.type === 'success' ? 'Terhapus' : 'Gagal menghapus');
+		};
 </script>
 
 <section class="space-y-6 pt-12">
 	<h2 class="text-2xl font-bold">Kategori Produk</h2>
 
 	<button
-		class="flex cursor-pointer items-center gap-2 rounded-sm px-8 py-2 text-sm font-semibold bg-[#0443F2] text-gray-200 hover:bg-[#0433C2]"
 		onclick={handleAdd}
+		class="flex items-center gap-2 rounded-sm bg-[#0443F2] px-8 py-2 text-sm font-semibold text-gray-200 hover:bg-[#0433C2]"
 	>
 		<Icon icon="mdi:plus" width="20" height="20" /> Tambah Kategori
 	</button>
 
+	<!-- Modal Tambah/Edit -->
 	{#if showModal}
 		<div class="fixed inset-0 z-50 flex items-center justify-center">
 			<button
@@ -114,23 +98,28 @@
 				class="absolute inset-0 bg-slate-950/40"
 				onclick={() => (showModal = false)}
 				aria-label="Close modal"
+			></button>
+			<form
+				method="POST"
+				use:enhance={handleSave}
+				action={isEditMode ? '?/update' : '?/create'}
+				class="relative w-96 rounded-lg bg-gray-50 p-6 shadow-lg"
 			>
-			</button>
-			<div class="fixed inset-0 z-50 flex items-center justify-center">
-				<form
-					method="POST"
-					use:enhance={handleSave}
-					action={isEditMode ? '?/update' : '?/create'}
-					class="relative w-96 rounded-lg bg-gray-50 p-6 shadow-lg"
-				>
-					<h3 class="mb-4 text-lg font-semibold">{isEditMode ? 'Edit Kategori' : 'Kategori Baru'}</h3>
+				{#if isEditMode}<input type="hidden" name="id" value={editId!} />{/if}
+
+				<div class="space-y-4">
+					<h3 class="mb-4 text-lg font-semibold">
+						{isEditMode ? 'Edit Kategori' : 'Kategori Baru'}
+					</h3>
 					{#if isEditMode}
 						<input type="hidden" name="id" value={editId} />
 					{/if}
-	
+
 					<div class="space-y-4">
-						<div >
-							<label for="name" class="block text-sm font-medium pb-1">Nama<span class="text-red-700">*</span></label>
+						<div>
+							<label for="name" class="block pb-1 text-sm font-medium"
+								>Nama<span class="text-red-700">*</span></label
+							>
 							<input
 								name="name"
 								bind:value={newName}
@@ -139,19 +128,24 @@
 								placeholder="Nama produk"
 							/>
 						</div>
-	
+
 						<div>
-							<label for="slug" class="block text-sm font-medium pb-1">Slug<span class="text-red-700">*</span></label>
-							<input 
-								name="slug" 
-								bind:value={newSlug} 
-								class="w-full rounded border px-3 py-2" 
+							<label for="slug" class="block pb-1 text-sm font-medium"
+								>Slug<span class="text-red-700">*</span></label
+							>
+							<input
+								name="slug"
+								bind:value={newSlug}
+								class="w-full rounded border px-3 py-2"
 								required
-								placeholder="slug-kategori"/>
+								placeholder="slug-kategori"
+							/>
 						</div>
-	
+
 						<div>
-							<label for="description" class="block text-sm font-medium pb-1">Deskripsi<span class="text-red-700">*</span></label>
+							<label for="description" class="block pb-1 text-sm font-medium"
+								>Deskripsi<span class="text-red-700">*</span></label
+							>
 							<textarea
 								name="description"
 								bind:value={newDescription}
@@ -159,9 +153,11 @@
 								placeholder="Deskripsi kategori"
 							></textarea>
 						</div>
-	
+
 						<div>
-							<label for="parent_id" class="block text-sm font-medium pb-1">Parent Category<span class="text-red-700">*</span></label>
+							<label for="parent_id" class="block pb-1 text-sm font-medium"
+								>Parent Category<span class="text-red-700">*</span></label
+							>
 							<select
 								name="parent_id"
 								bind:value={newParentId}
@@ -173,76 +169,69 @@
 								{/each}
 							</select>
 						</div>
-	
+
 						<div class="flex items-center gap-2">
-							<input type="checkbox" name="is_active" checked={newIsActive} />
+							<input type="checkbox" name="is_active" value="true" bind:checked={newIsActive} />
 							<label for="" class="text-sm">Active</label>
 						</div>
 					</div>
-	
-					<div class="mt-4 flex justify-end gap-2">
-						<button
-							type="button"
-							onclick={() => (showModal = false)}
-							class="rounded bg-gray-200 px-4 py-2 hover:bg-gray-300"
-						>
-							Batal
+				</div>
+
+				<div class="mt-4 flex justify-end gap-2">
+					<button
+						type="button"
+						onclick={() => (showModal = false)}
+						class="rounded bg-gray-200 px-4 py-2 hover:bg-gray-300"
+					>
+						Batal
+					</button>
+					<button
+						type="submit"
+						class="rounded bg-[#0443F2] px-4 py-2 text-gray-200 hover:bg-[#0433C2]"
+					>
+						Simpan
+					</button>
+				</div>
+			</form>
+		</div>
+	{/if}
+
+	<!-- Modal Hapus -->
+	{#if showDeleteModal}
+		<div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40">
+			<div class="w-full max-w-sm rounded-lg bg-white p-6 shadow">
+				<h3 class="mb-2 text-lg font-semibold">Hapus Kategori</h3>
+				<p class="mb-0.5 text-gray-700">
+					Yakin hapus <strong class="text-red-700">{selectedDeleteName}</strong>?
+				</p>
+				<p class="mb-6 text-gray-700">Tindakan ini tidak bisa dibatalkan.</p>
+
+				<div class="flex justify-end gap-2">
+					<button
+						onclick={() => (showDeleteModal = false)}
+						class="rounded bg-gray-200 px-4 py-2 hover:bg-gray-300"
+					>
+						Batal
+					</button>
+					<form method="POST" action="?/delete" use:enhance={handleDelete}>
+						<input type="hidden" name="id" value={selectedDeleteId ?? ''} />
+						<button type="submit" class="rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700">
+							Hapus
 						</button>
-						<button
-							type="submit"
-							onclick={() => (showModal = false)}
-							class="rounded bg-[#0443F2] px-4 py-2 text-gray-200 hover:bg-[#0433C2]"
-						>
-							Simpan
-						</button>
-					</div>
-				</form>
+					</form>
+				</div>
 			</div>
 		</div>
 	{/if}
 
-	{#if showDeleteModal}
-		<div class="fixed inset-0 z-50 flex items-center justify-center">
-			<button
-				type="button"
-				class="absolute inset-0 bg-slate-950/40"
-				onclick={() => (showDeleteModal = false)}
-				aria-label="Close modal"
-			>
-			</button>
-		</div>
-	{/if}
-
-	{#if showDeleteModal}
-		<div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40">
-			<div class="w-full max-w-sm rounded-lg bg-white p-6 shadow">	
-					<h3 class="mb-2 text-lg font-semibold">Hapus Kategori</h3>
-					<p class="mb-0.5 text-gray-700">Apa Anda yakin hapus kategori <strong class="text-red-700">{selectedDeleteName}</strong>?</p>
-					<p class="mb-6 text-gray-700">Tindakan ini tidak bisa dibatalkan</p>
-					<div class="flex justify-end gap-2">
-						<button
-							onclick={() => (showDeleteModal = false)}
-							class="rounded bg-gray-200 px-4 py-2 hover:bg-gray-300"
-						>
-							Batal
-						</button>
-						<button
-							onclick={handleDeleteConfirmed}
-							class="rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700"
-						>
-							Hapus
-						</button>
-					</div>
-				</div>		
-		</div>
-	{/if}
-
+	<!-- Toast -->
 	{#if showFeedback}
 		<div class="fixed right-4 bottom-4 rounded bg-white px-4 py-2 shadow-lg">
 			<p>{feedbackMessage}</p>
 		</div>
 	{/if}
 
+	<!-- Tabel -->
 	<div class="mt-4 overflow-x-auto rounded bg-white shadow">
 		<table class="min-w-full divide-y divide-gray-200">
 			<thead class="bg-gray-100">
@@ -257,7 +246,7 @@
 			</thead>
 			<tbody class="divide divide-y">
 				{#each categories as c (c.id)}
-					<tr class="hover:bg-gray-50 border-b-gray-200">
+					<tr class="border-b-gray-200 hover:bg-gray-50">
 						<td class="px-4 py-3">{c.name}</td>
 						<td class="px-4 py-3 text-blue-700">{c.parent ?? '-'}</td>
 						<td class="px-4 py-3 text-center">

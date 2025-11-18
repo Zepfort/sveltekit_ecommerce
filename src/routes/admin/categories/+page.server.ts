@@ -1,5 +1,5 @@
 // src/routes/categories/+page.server.ts
-import { redirect, error } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import { createSupabaseServerClient } from '$lib/supabaseServer';
 import type { PageServerLoad, Actions } from './$types';
 
@@ -36,7 +36,7 @@ export const actions: Actions = {
     const slug = String(form.get('slug') ?? '').trim();
     const description = String(form.get('description') ?? '').trim() || null;
     const parent_id = String(form.get('parent_id') ?? '') || null;
-    const is_active = form.get('is_active') === 'true';
+    const is_active = form.get('is_active') !== null;
 
     if (!name) {
       return { success: false, message: 'Name is required' };
@@ -61,7 +61,7 @@ export const actions: Actions = {
     const slug = String(form.get('slug') ?? '').trim();
     const description = String(form.get('description') ?? '').trim() || null;
     const parent_id = String(form.get('parent_id') ?? '') || null;
-    const is_active = form.get('is_active') === 'true';
+    const is_active = form.get('is_active') !== null;
 
     if (!id) {
       return { success: false, message: 'Category ID is required' };

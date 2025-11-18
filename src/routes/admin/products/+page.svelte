@@ -211,7 +211,6 @@
 								name="category_id"
 								bind:value={newCategoryId}
 								class="w-full rounded border px-3 py-2"
-								required
 							>
 								<option value="">-- Pilih --</option>
 								{#each categories as c}
