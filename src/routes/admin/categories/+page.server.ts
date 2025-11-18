@@ -50,7 +50,7 @@ export const actions: Actions = {
       return { success: false, message: insertErr.message };
     }
 
-    return { success: true, message: 'Category created' };
+    return { success: true, message: 'Kategori berhasil dibuat' };
   },
 
   update: async (event) => {

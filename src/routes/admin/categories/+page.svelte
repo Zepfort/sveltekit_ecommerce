@@ -23,12 +23,12 @@
 	let selectedDeleteName = $state('');
 	let showFeedback = $state(false);
 	let feedbackMessage = $state('');
+	let showFeedbackModal = $state(false);
+	/* ---------- UI state ---------- */
 
-	/* ---------- helpers ---------- */
-	function showToast(msg: string) {
+	function showModalFeedback(msg: string) {
 		feedbackMessage = msg;
-		showFeedback = true;
-		setTimeout(() => (showFeedback = false), 2500);
+		showFeedbackModal = true;
 	}
 
 	/* ---------- modal ---------- */
@@ -62,12 +62,13 @@
 		() =>
 		async ({ result, update }) => {
 			await update({ reset: false, invalidateAll: true }); // reload data
-			showToast(
-				(result.type === 'success' || result.type === 'failure'
-					? result.data?.message
-					: undefined) ?? 'Gagal menyimpan'
-			);
-			showModal = false; 
+			if (result.type === 'success') {
+				showModal = false;
+				showModalFeedback(result.data?.message ?? 'Tersimpan');
+			} else if (result.type === 'failure') {
+				showModalFeedback(result.data?.message ?? 'Gagal menyimpan');
+			}
+			showModal = false;
 		};
 
 	const handleDelete: SubmitFunction =
@@ -76,7 +77,7 @@
 			await update({ reset: false, invalidateAll: true });
 			showDeleteModal = false;
 			selectedDeleteId = null;
-			showToast(result.type === 'success' ? 'Terhapus' : 'Gagal menghapus');
+			showModalFeedback(result.type === 'success' ? 'Kategori berhasilterhapus' : 'Gagal menghapus');
 		};
 </script>
 
@@ -156,7 +157,7 @@
 
 						<div>
 							<label for="parent_id" class="block pb-1 text-sm font-medium"
-								>Parent Category<span class="text-red-700">*</span></label
+								>Parent Category</label
 							>
 							<select
 								name="parent_id"
@@ -224,10 +225,19 @@
 		</div>
 	{/if}
 
-	<!-- Toast -->
-	{#if showFeedback}
-		<div class="fixed right-4 bottom-4 rounded bg-white px-4 py-2 shadow-lg">
-			<p>{feedbackMessage}</p>
+	<!-- Modal Feedback -->
+	{#if showFeedbackModal}
+		<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+			<div class="w-[380px] rounded-lg bg-white p-6 text-center shadow-lg">
+				<h2 class="mb-2 text-lg font-semibold text-green-600">Berhasil!</h2>
+				<p class="mb-4 text-gray-700">{feedbackMessage}</p>
+				<button
+					class="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+					onclick={() => (showFeedbackModal = false)}
+				>
+					Oke
+				</button>
+			</div>
 		</div>
 	{/if}
 
