@@ -21,7 +21,7 @@ export const load: PageServerLoad = async (event) => {
 		.eq('user_id', user.id)
 		.order('is_default', { ascending: false });
 
-	let items: Array<{ id: string; name: string; image_url: string; price: number; qty: number }> =
+	let items: Array<{ id: string; name: string; image_url: string; price: number; qty: number, slug: string }> =
 		[];
 
 	if (slug) {
@@ -40,7 +40,8 @@ export const load: PageServerLoad = async (event) => {
 				name: data.name,
 				image_url: data.image_url,
 				price: Number(data.price),
-				qty
+				qty,
+				slug: data.slug
 			}
 		];
 		fromCart = false;
@@ -70,7 +71,7 @@ export const load: PageServerLoad = async (event) => {
 			if (!it.product_id || !it.qty) continue;
 			const { data: product } = await supabase
 				.from('products')
-				.select('id, name, image_url, price')
+				.select('id, name, image_url, price, slug')
 				.eq('id', it.product_id)
 				.maybeSingle();
 			if (!product) continue;
@@ -80,7 +81,8 @@ export const load: PageServerLoad = async (event) => {
 				name: product.name,
 				image_url: product.image_url,
 				price: Number(product.price),
-				qty: it.qty
+				qty: it.qty,
+				slug: product.slug ?? undefined
 			});
 		}
 		fromCart = true;
@@ -103,6 +105,8 @@ export const actions: Actions = {
 		);
 		const total = parseFloat(formData.get('total') as string);
 		const addressId = formData.get('address_id') as string;
+		const slug = formData.get('slug') as string; // <-- baru
+		const qty = formData.get('qty') as string;   //
 
 		// order record 
 		const orderId = crypto.randomUUID(); // PK (uuid)
@@ -148,13 +152,14 @@ export const actions: Actions = {
 		}));
 		const grossAmount = itemDetails.reduce((s, it) => s + it.price * it.quantity, 0);
 
-		const midtransUrl = 'https://app.sandbox.midtrans.com/snap/v1/transactions'; // <= tanpa spasi
+		const midtransUrl = 'https://app.sandbox.midtrans.com/snap/v1/transactions'; 
 		const serverKey = MIDTRANS_SERVER_KEY;
 		if (!serverKey) {
 			console.error('MIDTRANS_SERVER_KEY tidak ditemukan di .env');
 			throw error(500, 'Konfigurasi Midtrans tidak lengkap');
 		}
 
+		
 		const finishUrl = `${event.url.origin}/checkout/success?orderId=${orderNumber}`;
 
 		const response = await fetch(midtransUrl, {
@@ -191,9 +196,12 @@ export const actions: Actions = {
 		// cegah redirect kalau gagal  
 		if (!response.ok || !midtransData?.redirect_url) {
 			console.error('Midtrans error:', midtransData);
-			throw error(
-				500,
-				midtransData?.error_messages?.join(', ') || 'Gagal membuat token pembayaran'
+			const params = slug && qty ? `?slug=${encodeURIComponent(slug)}&qty=${qty}` : '';
+			throw redirect(
+				303,
+				`/checkout/error${params}&order_id=${orderNumber}&status_message=${
+					midtransData?.error_messages?.join(', ') || 'Gagal membuat token pembayaran'
+				}`
 			);
 		}
 
@@ -221,7 +229,7 @@ export const actions: Actions = {
 
 			throw error(409, e.message || 'Stok tidak cukup')
 		}
-
+		console.log('Will redirect to SNAP:', midtransData.redirect_url);
 		throw redirect(303, midtransData.redirect_url);
 	}
 };

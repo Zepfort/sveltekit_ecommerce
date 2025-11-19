@@ -10,6 +10,7 @@
 		price: number;
 		qty: number;
 		image_url?: string;
+		slug?: string;
 	};
 
 	// ambil data load()
@@ -25,9 +26,24 @@
 
 	let addresses = $state(data.addresses ?? []);
 	let selectedAddressId = $state<string>(addresses.find((a) => a.is_default)?.id ?? '');
+	 let formEl = $state<HTMLFormElement>(); // referensi form
 
-	let slug = page.url.searchParams.get('slug');
-	let qty = page.url.searchParams.get('qty');
+	function saveRedirect() {
+		// mode beli langsung
+		if (!data.fromCart && data.items.length === 1) {
+			const item = data.items[0];
+			sessionStorage.setItem(
+				'checkoutRedirect',
+				JSON.stringify({
+					slug: item.slug, // pastikan Anda kirim slug dari server
+					qty: item.qty
+				})
+			);
+		} else {
+			// mode keranjang → bersihkan
+			 sessionStorage.setItem('checkoutRedirect', JSON.stringify({ cart: true }));
+		}
+	}
 </script>
 
 <div class="container mx-auto px-4">
@@ -39,12 +55,10 @@
 			<div class="grid grid-cols-1 gap-8 md:grid-cols-2">
 				<!-- KIRI: daftar produk -->
 				<div class="flex flex-col gap-4">
-					<div class="flex flex-col items-start rounded-lg border p-4 shadow-md">
+					<div class="flex flex-col items-start rounded-sm border border-gray-400 p-4 shadow-md">
 						<h2 class="pl-1 text-xl font-semibold text-gray-500">Alamat Pengiriman</h2>
 						<div class="flex gap-1 pt-2">
-							<Icon icon="mdi:location" width="28" height="24" style="color: #DC2626;" />
-							<div class="flex flex-col items-start rounded-sm border p-4 shadow-md">
-								<h2 class="pl-1 text-xl font-semibold text-gray-500">Alamat Pengiriman</h2>
+							<div class="flex flex-col items-start rounded-sm border p-4 border-gray-300 shadow-md">
 								{#if addresses.length}
 									<div class="mt-2 flex flex-col gap-2">
 										{#each addresses as addr (addr.id)}
@@ -75,7 +89,7 @@
 					<!-- Daftar produk -->
 					<ul class="space-y-4">
 						{#each items as it (it.id)}
-							<li class="flex items-center gap-4 rounded border p-3 shadow-sm">
+							<li class="flex items-center gap-4 rounded border border-gray-300 p-3 shadow-sm">
 								<img src={it.image_url} alt={it.name} class="h-16 w-16 rounded-sm object-cover" />
 								<div class="flex-1">
 									<p class="font-medium text-gray-900">{it.name}</p>
@@ -90,7 +104,7 @@
 				</div>
 
 				<!-- KANAN: ringkasan pesanan -->
-				<div class="flex h-fit flex-col justify-between rounded-lg border bg-gray-50 p-6 shadow-md">
+				<div class="flex h-fit flex-col justify-between rounded-lg border border-gray-400 bg-gray-50 p-6 shadow-md">
 					<div>
 						<h3 class="mb-4 text-lg font-semibold text-gray-900">Ringkasan Pesanan</h3>
 						{#each items as it (it.id)}
@@ -105,14 +119,20 @@
 							<span>Rp {grandTotal.toLocaleString('id-ID')}</span>
 						</div>
 					</div>
-					<form method="POST">
+					<form method="POST" bind:this={formEl}>
 						<input type="hidden" name="items" value={JSON.stringify(items)} />
 						<input type="hidden" name="total" value={grandTotal} />
 						<input type="hidden" name="address_id" value={selectedAddressId} />
+						<input type="hidden" name="qty"  value={page.url.searchParams.get('qty')  ?? '1'} />
 						<button
 							class="mt-6 w-full cursor-pointer rounded-sm bg-[#0443F2] py-3 font-semibold text-gray-200 hover:bg-[#0433C2]"
-							type="submit">Bayar Sekarang</button
-						>
+							type="button"
+							onclick={() => {
+								saveRedirect(); // 1. simpan dulu
+								formEl?.submit()
+							}}
+							>Bayar Sekarang
+						</button>
 					</form>
 				</div>
 			</div>
@@ -183,19 +203,25 @@
 								<span>Total</span>
 								<span>Rp {(Number(it.price) * it.qty).toLocaleString('id-ID')}</span>
 							</div>
-							<form method="POST">
+							<form method="POST" bind:this={formEl}>
 								<input type="hidden" name="items" value={JSON.stringify(items)} />
 								<input type="hidden" name="total" value={grandTotal} />
 								<input type="hidden" name="address_id" value={selectedAddressId} />
+								<input type="hidden" name="slug" value={page.url.searchParams.get('slug') ?? ''} />
 								<button
 									class="mt-6 w-full cursor-pointer rounded-sm bg-[#0443F2] py-3 font-semibold text-gray-200 hover:bg-[#0433C2]"
-									type="submit">Bayar Sekarang</button
-								>
+									type="button"
+									onclick={() => {
+										saveRedirect(); // 1. simpan dulu
+										formEl?.submit()
+									}}
+									>Bayar Sekarang
+								</button>
 							</form>
 						</div>
 					</div>
 				</div>
-				{/each}
+			{/each}
 		{/if}
 	{:else}
 		<p>Keranjang kosong atau tidak ada item untuk checkout.</p>

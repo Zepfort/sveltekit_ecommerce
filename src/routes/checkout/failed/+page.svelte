@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
   import { page } from '$app/stores';
+  import { onMount } from "svelte";
 
   let { orderId, errorMessage } = $props() as {
     orderId?: string;
@@ -10,18 +11,24 @@
   let slug = $page.url.searchParams.get('slug');
   let qty = $page.url.searchParams.get('qty');
 
-  function goToCheckout(){
-     if (slug && qty) {
-      goto(`/checkout?slug=${encodeURIComponent(slug)}&qty=${encodeURIComponent(qty)}`);
-    } else {
-      goto('/checkout');
-    }
-  }
+  let redirect: { slug?: string; qty?: number } = {};
+	onMount(() => {
+		const raw = sessionStorage.getItem('checkoutRedirect');
+		if (raw) redirect = JSON.parse(raw);
+	});
 
-  function contactSupport(){
-    goto('/')
-  }
+	function goToCheckout() {
+		if (redirect.slug && redirect.qty) {
+			goto(`/checkout?slug=${encodeURIComponent(redirect.slug)}&qty=${redirect.qty}`);
+		} else {
+			goto('/checkout'); 
+		}
+		sessionStorage.removeItem('checkoutRedirect'); // bersihkan
+	}
 
+  const waNumber = '6285641133135'; 
+  const waText = $derived(`Halo RenzMart, saya butuh bantuan untuk order ${orderId} :)`);
+  const waLink = $derived(`https://wa.me/${waNumber}?text=${encodeURIComponent(waText)}`);
 </script>
 
 <section class="min-h-screen w-full flex flex-col items-center justify-center bg-gray-100">
@@ -44,12 +51,13 @@
       >
         Kembali ke Checkout
       </button>
-      <button 
-        class="px-6 py-2 border border-blue-600 text-blue-600 rounded hover:bg-blue-50 transition"
-        onclick={contactSupport}
-      >
-        Hubungi Layanan Pelanggan
-      </button>
+       <div class="rounded border border-[#0443F2] px-6 py-2 text-[#0433C2] transition hover:bg-blue-50">
+      Butuh bantuan? <a href='{waLink}'
+      target="_blank" rel="noopener noreferrer"
+       >
+      Anda butuh bantuan?
+    </a>
+    </div>
     </div>
   </div>
 </section>

@@ -28,10 +28,12 @@
       </span>
     </div>
     <div class="user-dropdown">
-      <a href="/profile/account" class="block px-4 py-2 text-sm hover:bg-blue-700">
+      <a href="/profile/account" class="block flex gap-2 px-4 py-2 text-sm hover:bg-blue-700">
+       <Icon icon="mdi:account-circle" width="20" height="20" class="text-gray-50" />
         Profil
       </a>
-      <button onclick={logout} class="block w-full px-4 py-2 text-left text-sm hover:bg-blue-700">
+      <button onclick={logout} class="block flex gap-2 w-full px-4 py-2 text-left text-sm hover:bg-blue-700">
+        <Icon icon="mdi:logout" width="20" height="20" class="text-gray-50"/>
         Keluar
       </button>
     </div>
