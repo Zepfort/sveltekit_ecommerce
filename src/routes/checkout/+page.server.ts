@@ -5,7 +5,7 @@ import type { PageServerLoad, Actions } from './$types';
 import { MIDTRANS_SERVER_KEY } from '$env/static/private';
 
 export const load: PageServerLoad = async (event) => {
-	const { url, cookies } = event; 
+	const { url, cookies } = event;
 	const supabase = createSupabaseServerClient(event);
 	const slug = url.searchParams.get('slug');
 	const qtyParam = url.searchParams.get('qty');
@@ -21,11 +21,17 @@ export const load: PageServerLoad = async (event) => {
 		.eq('user_id', user.id)
 		.order('is_default', { ascending: false });
 
-	let items: Array<{ id: string; name: string; image_url: string; price: number; qty: number, slug: string }> =
-		[];
+	let items: Array<{
+		id: string;
+		name: string;
+		image_url: string;
+		price: number;
+		qty: number;
+		slug: string;
+	}> = [];
 
 	if (slug) {
-		// mode beli langsung 
+		// mode beli langsung
 		const { data, error: fetchError } = await supabase
 			.from('products')
 			.select('*')
@@ -92,7 +98,7 @@ export const load: PageServerLoad = async (event) => {
 	return { items, total, fromCart, addresses };
 };
 
-//  ACTIONS 
+//  ACTIONS
 export const actions: Actions = {
 	default: async (event) => {
 		const supabase = createSupabaseServerClient(event);
@@ -106,9 +112,9 @@ export const actions: Actions = {
 		const total = parseFloat(formData.get('total') as string);
 		const addressId = formData.get('address_id') as string;
 		const slug = formData.get('slug') as string; // <-- baru
-		const qty = formData.get('qty') as string;   //
+		const qty = formData.get('qty') as string; //
 
-		// order record 
+		// order record
 		const orderId = crypto.randomUUID(); // PK (uuid)
 		const orderNumber = `order-${Date.now()}`; // nomor untuk Midtrans (text)
 
@@ -133,7 +139,7 @@ export const actions: Actions = {
 			throw error(500, 'Gagal membuat order');
 		}
 
-		// insert order_items 
+		// insert order_items
 		for (const item of items) {
 			await supabase.from('order_items').insert({
 				order_id: orderId,
@@ -143,23 +149,22 @@ export const actions: Actions = {
 			});
 		}
 
-		//  parameter Midtrans  
+		//  parameter Midtrans
 		const itemDetails = items.map((it) => ({
 			id: it.id,
 			price: it.price,
 			quantity: it.qty,
-			name: it.name.slice(0, 50) // potong nama 
+			name: it.name.slice(0, 50) // potong nama
 		}));
 		const grossAmount = itemDetails.reduce((s, it) => s + it.price * it.quantity, 0);
 
-		const midtransUrl = 'https://app.sandbox.midtrans.com/snap/v1/transactions'; 
+		const midtransUrl = 'https://app.sandbox.midtrans.com/snap/v1/transactions';
 		const serverKey = MIDTRANS_SERVER_KEY;
 		if (!serverKey) {
 			console.error('MIDTRANS_SERVER_KEY tidak ditemukan di .env');
 			throw error(500, 'Konfigurasi Midtrans tidak lengkap');
 		}
 
-		
 		const finishUrl = `${event.url.origin}/checkout/success?orderId=${orderNumber}`;
 
 		const response = await fetch(midtransUrl, {
@@ -193,7 +198,7 @@ export const actions: Actions = {
 			throw error(500, 'Response Midtrans tidak valid');
 		}
 
-		// cegah redirect kalau gagal  
+		// cegah redirect kalau gagal
 		if (!response.ok || !midtransData?.redirect_url) {
 			console.error('Midtrans error:', midtransData);
 			const params = slug && qty ? `?slug=${encodeURIComponent(slug)}&qty=${qty}` : '';
@@ -205,14 +210,13 @@ export const actions: Actions = {
 			);
 		}
 
-		// simpan payment_id & redirect 
+		// simpan payment_id & redirect
 		await supabase
 			.from('orders')
 			.update({ payment_id: midtransData.transaction_id })
 			.eq('id', orderId);
 
-			
-		try{
+		try {
 			for (const item of items) {
 				const { error: rpcErr } = await supabase.rpc('decrement_stock', {
 					pid: item.id,
@@ -220,16 +224,22 @@ export const actions: Actions = {
 				});
 				if (rpcErr) throw rpcErr;
 			}
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (e: any) {
 			console.error('Gagal kurangi stok', e);
-			await supabase.from('orders')
-			.delete()
+			await supabase.from('orders').delete().eq('id', orderId);
+
+			throw error(409, e.message || 'Stok tidak cukup');
+		}
+
+		await supabase
+			.from('orders')
+			.update({
+				snap_token: midtransData.token,
+				redirect_url: midtransData.redirect_url
+			})
 			.eq('id', orderId);
 
-			throw error(409, e.message || 'Stok tidak cukup')
-		}
-		console.log('Will redirect to SNAP:', midtransData.redirect_url);
 		throw redirect(303, midtransData.redirect_url);
 	}
 };
