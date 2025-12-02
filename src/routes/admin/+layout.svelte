@@ -97,7 +97,7 @@
 						<div class="user-badge-group">
 							<div class="user-info">
 								<div
-									class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-600 text-gray-200"
+									class="flex h-9 w-9 items-center justify-center rounded-full bg-[#0443F2] text-gray-200"
 								>
 									<Icon icon="material-symbols:person-outline" width="24" height="24" />
 								</div>
@@ -105,11 +105,6 @@
 									{userProfile?.name}
 								</span>
 							</div>
-							<!-- <div class="user-dropdown">
-								<a href="/profile/" class="col-bg-admin block cursor-pointer px-4 py-2 text-sm">
-									Profil
-								</a>
-							</div> -->
 						</div>
 					{:else}
 						<div class="flex gap-2">
