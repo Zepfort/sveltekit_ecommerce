@@ -1,11 +1,9 @@
-<svelte:options runes={true} />
-
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { enhance } from '$app/forms';
   import Icon from '@iconify/svelte';
 
- // ambil props (misalnya data dari load())
+ // ambil props 
   let { data, error: serverError } = $props();
 
   // reactive state

@@ -4,7 +4,7 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async (event) => {
   const supabase = createSupabaseServerClient(event);
 
-  // Ambil data produk dari view
+  // data produk dari view
   const { data: productsRaw, error } = await supabase
     .from('products_with_category')
     .select('*')
@@ -35,7 +35,7 @@ export const load: PageServerLoad = async (event) => {
       price: typeof row.price === 'number' ? row.price : parseFloat(row.price),
       image_url: row.image_url ?? '',
       rating: row.rating ?? 0,
-      sold: soldCount ?? 0 // ← hasil RPC
+      sold: soldCount ?? 0 // hasil RPC
     });
   }
 

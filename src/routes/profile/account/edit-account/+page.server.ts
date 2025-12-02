@@ -46,7 +46,7 @@ export const actions: Actions = {
       return fail(400, { error: 'Nama wajib diisi.' });
     }
 
-    // 1) Update nama di public.users
+    // Update nama di public.users
     const { error: updateProfileErr } = await supabase
       .from('users')
       .update({ name })
@@ -67,8 +67,6 @@ export const actions: Actions = {
         console.error('Update auth failed:', authErr);
         return fail(500, { error: 'Gagal memperbarui sandi.' });
       }
-
-      // Opsional: sign out agar session/pw sinkron — tapi bisa di-handle UI secara berbeda
       // await supabase.auth.signOut();
 
       return { success: true, message: 'Profil & sandi berhasil diperbarui.' };

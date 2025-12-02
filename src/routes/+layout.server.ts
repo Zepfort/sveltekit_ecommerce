@@ -12,7 +12,7 @@ type Category = {
 export const load: LayoutServerLoad = async ({ locals, url }) => {
   const { supabase, safeGetSession } = locals;
 
-  // Jika ada parameter `code`, tukar menjadi session (OAuth / PKCE flow)
+  // Jika ada parameter `code`, tukar menjadi session 
   const code = url.searchParams.get('code');
   if (code) {
     try {
@@ -50,6 +50,7 @@ export const load: LayoutServerLoad = async ({ locals, url }) => {
     const { data: catData, error: catError } = await supabase
       .from('categories')
       .select('id, name, slug, parent_id, order_index')
+      .neq('slug', 'uncategorized')
       .order('name', { ascending: true });
 
     if (catError) throw catError;
@@ -65,6 +66,6 @@ export const load: LayoutServerLoad = async ({ locals, url }) => {
     user,
     userProfile,
     mainCategories: JSON.parse(JSON.stringify(mainCategories)),
-  subCategories: JSON.parse(JSON.stringify(subCategories))
+    subCategories: JSON.parse(JSON.stringify(subCategories))
   };
 };
