@@ -3,12 +3,12 @@
 
   const subject = encodeURIComponent(`Bantuan Website`);
   const body    = encodeURIComponent(
-    `Halo RenzMart,\n\nSaya butuh bantuan terkait website ini.\n\nTerima kasih.`
+    `Halo ReznMart,\n\nSaya butuh bantuan terkait website ini.\n\nTerima kasih.`
   );
   const mailto = `mailto:alvinzrenx788@gmail.com?subject=${subject}&body=${body}`;
 
   const waNumber = '6285641133135'; 
-  const waText = $derived(`Saya butuh bantuan Anda terkait website Renzmart`);
+  const waText = $derived(`Saya butuh bantuan Anda terkait website ReznMart`);
   const waLink = $derived(`https://wa.me/${waNumber}?text=${encodeURIComponent(waText)}`);
 
   const categories = [
@@ -29,7 +29,7 @@
   >
     <!-- Logo -->
     <div class="flex flex-col items-start gap-4">
-      <h2 class="text-3xl font-bold sm:text-4xl">RenzMart</h2>
+      <h2 class="text-3xl font-bold sm:text-4xl">ReznMart</h2>
       <p class="text-sm text-gray-400">Toko online terpercaya</p>
     </div>
 

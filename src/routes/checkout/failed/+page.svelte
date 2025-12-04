@@ -27,7 +27,7 @@
 	}
 
   const waNumber = '6285641133135'; 
-  const waText = $derived(`Halo RenzMart, saya butuh bantuan untuk order ${orderId} :)`);
+  const waText = $derived(`Halo ReznMart, saya butuh bantuan untuk order ${orderId} :)`);
   const waLink = $derived(`https://wa.me/${waNumber}?text=${encodeURIComponent(waText)}`);
 </script>
 

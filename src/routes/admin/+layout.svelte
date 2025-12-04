@@ -45,7 +45,7 @@
 	<aside class="fixed flex h-screen w-72 flex-col bg-[#07071a] text-gray-200">
 		<div class="border-b border-white/6 px-6 py-5">
 			<a href="/" class="flex items-center gap-3">
-				<div class="text-2xl font-extrabold">RenzMart</div>
+				<div class="text-2xl font-extrabold">ReznMart</div>
 			</a>
 		</div>
 

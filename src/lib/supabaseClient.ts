@@ -8,8 +8,8 @@ export const supabase = createBrowserClient(
 )
 
 // const { data, error } = await supabase.auth.signInWithPassword({
-//   email: 'adminrenzmart@gmail.com',
-//   password: 'Admin_Renzmart'
+//   email: 'adminreznMart@gmail.com',
+//   password: 'Admin_ReznMart'
 // });
 // console.log('signIn data', data);
 // console.log('signIn error', error);

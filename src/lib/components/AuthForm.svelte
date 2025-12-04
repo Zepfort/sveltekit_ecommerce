@@ -23,7 +23,7 @@
 <div class="flex flex-col md:flex-row w-full items-center justify-center md:justify-between pt-12 pb-16 md:pt-0 md:pb-0">
 	<!-- Left: Brand -->
 	<div class="flex w-full md:w-1/2 justify-center py-10 md:py-0">
-		<h1 class="text-primary text-5xl md:text-8xl font-semibold">RenzMart</h1>
+		<h1 class="text-primary text-5xl md:text-8xl font-semibold">ReznMart</h1>
 	</div>
 
 	<!-- Right: Form -->

@@ -48,7 +48,7 @@
     <!-- KIRI -->
       <!-- Logo -->
       <a href="/" class="sm:hidden md:block shrink-0 text-xl font-bold text-gray-200 lg:pl-40">
-        RenzMart
+        ReznMart
       </a>
 
     <!-- Kategori : hanya muncul di lg+ -->

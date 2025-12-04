@@ -8,13 +8,13 @@
   const { orderId, items, total, paidAt, paymentType, address } = $derived(data);
 
   const waNumber = '6285641133135'; 
-  const waText = $derived(`Halo RenzMart, saya butuh bantuan untuk order ${orderId} :)`);
+  const waText = $derived(`Halo ReznMart, saya butuh bantuan untuk order ${orderId} :)`);
   const waLink = $derived(`https://wa.me/${waNumber}?text=${encodeURIComponent(waText)}`);
 </script>
 
 <svelte:head>
-  <title>Pembayaran Berhasil – RenzMart</title>
-  <meta name="description" content="Pembayaran Anda telah dikonfirmasi. Terima kasih telah berbelanja di RenzMart!" />
+  <title>Pembayaran Berhasil – ReznMart</title>
+  <meta name="description" content="Pembayaran Anda telah dikonfirmasi. Terima kasih telah berbelanja di ReznMart!" />
 </svelte:head>
 
 <main class="min-h-screen w-full bg-slate-50 px-4 py-6 sm:py-8">
@@ -28,7 +28,7 @@
         </svg>
       </div>
       <h1 class="text-2xl font-bold text-slate-800 sm:text-3xl">Pembayaran Berhasil</h1>
-      <p class="mt-1 text-sm text-slate-500">Terima kasih telah berbelanja di RenzMart</p>
+      <p class="mt-1 text-sm text-slate-500">Terima kasih telah berbelanja di ReznMart</p>
     </div>
 
     <!-- Ringkasan -->
